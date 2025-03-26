@@ -1,0 +1,32 @@
+name: bharatpro
+services:
+  #
+  # core backend services
+  #
+
+  # iam-service:
+  #   image: python:
+  #   container_name: iam # Identity and Access Management (IAM)
+
+
+
+
+
+  #
+  # 
+  #
+  auth:
+    image: quay.io/keycloak/keycloak:24.0.1
+    ports:
+      - 8080:8080
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    command:
+      - start-dev
+      - --import-realm
+    volumes:
+      - keycloak-data:/opt/keycloak/data/
+
+volumes:
+  keycloak-data:

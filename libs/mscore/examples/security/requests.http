@@ -1,0 +1,112 @@
+# Keycloak (authentication flow):  password grant
+# @name login
+
+POST http://localhost:8080/realms/mscore/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=password
+&username=user-1
+&password=Bilal@1996
+&client_id=api-test
+&scope=openid
+###
+
+
+# Keycloak: fetch user info
+@access_token = {{login.response.body.access_token}}
+
+GET http://localhost:8080/realms/mscore/protocol/openid-connect/userinfo
+Authorization: Bearer {{ access_token }}
+###
+
+
+
+
+# Keycloak (authentication flow):  password grant
+# @name login
+
+POST http://localhost:8080/realms/mscore/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=password
+&username=user-1
+&password=Bilal@1996
+&client_id=api-test
+&scope=openid
+###
+
+
+
+
+
+
+
+
+OPTIONS http://localhost:8080/realms/mscore/protocol/openid-connect/token HTTP/1.1
+Origin: http://localhost
+Access-Control-Request-Method: POST
+Access-Control-Request-Headers: Content-Type
+###
+
+
+POST http://localhost:8080/realms/mscore/protocol/openid-connect/auth
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=password
+&client_id=api-test
+###
+
+
+
+
+
+
+
+
+
+
+#
+# Keycloak: password grant
+#
+POST http://localhost:8080/realms/oauth2-password-flow/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=password
+&username=test
+&password=Bilal@1996
+&client_id=api-test-new
+&client_secret=AVcT31Q2trGqpxhRIcB99Hv8ZcrG55vV
+###
+
+
+
+POST http://localhost:8080/realms/oauth2-password-flow/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+Authorization: Basic YXBpLXRlc3QtbmV3Mjog
+
+grant_type=password
+&username=test
+&password=Bilal@1996
+###
+
+
+
+#
+# Keycloak: client_credentials grant
+#
+POST http://localhost:8080/realms/oauth2-client-credentials-demo/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=client_credentials
+&client_id=api-test-2
+&client_secret=7Sgdoeys07xYOPMk3U67R5DnGZPjqdl3
+###
+
+
+POST http://localhost:8080/realms/oauth2-client-credentials-demo/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+Authorization: Basic YXBpLXRlc3QtMjo5TTBqcmU4OHBkZEd1WmNrWXZOMTRkbVdLSWNteVVOUA==
+
+grant_type=client_credentials
+###
+

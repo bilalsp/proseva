@@ -1,0 +1,64 @@
+[tool.poetry]
+name = "mscore"
+version = "0.1.0"
+description = ""
+authors =  ["Mohammed Bilal Ansari <mohammedbilalansari.321@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.110.0"
+python-keycloak = "^3.9.1"
+pydantic_settings = "^2.2.1"
+toml = "^0.10.2"
+types-toml = "^0.10"
+#
+# used by main.py
+#
+python-multipart = "^0.0.9"
+uvicorn = "^0.27.1"
+python-jose = {version = "^3.3.0", extras = ["cryptography"]}
+
+[tool.poetry.group.dev]
+optional = true
+
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^3.6.0"
+ruff = "^0.2.1"
+mypy = "^1.9.0"
+
+# [tool.poetry.scripts]
+# runserver = "examples.main:main"
+
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "B",  # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "UP",  # pyupgrade
+]
+ignore = [
+    "E501",  # line too long, handled by black
+    "B008",  # do not perform function calls in argument defaults
+    "W191",  # indentation contains tabs
+]
+
+[tool.mypy]
+strict = true
+follow_imports = "normal"
+ignore_missing_imports = true
+no_implicit_reexport = false
+show_column_numbers= true
+show_error_codes= true
+exclude = "examples/.*"
+
+# [[tool.mypy.overrides]]
+# module = "examples/*"
+# ignore_errors = true
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

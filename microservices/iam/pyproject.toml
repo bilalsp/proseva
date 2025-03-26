@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "iam"
+version = "0.1.0"
+description = ""
+authors = ["Mohammed Bilal Ansari <mohammedbilalansari.321@gmail.com>"]
+readme = "README.md"
+package-mode = true
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.110.0"
+mscore = {path = "../mscore", develop = true}
+
+[tool.poetry.group.dev]
+optional = true
+
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^3.6.0"
+ruff = "^0.2.1"
+mypy = "^1.9.0"
+
+[tool.poetry.scripts]
+iam-service = "iam.__main__:runserver"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

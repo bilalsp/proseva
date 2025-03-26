@@ -1,0 +1,99 @@
+from functools import lru_cache
+from pathlib import Path
+from typing import Annotated, Any, TypeVar, cast
+
+from pydantic import BaseModel, Field, HttpUrl, computed_field
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+from mscore.errors import MSCoreUserError
+
+TSettings = TypeVar("TSettings", bound=BaseSettings)
+
+
+class Microservice(BaseModel):
+    port: Annotated[
+        int,
+        Field(
+            description="The port where the microservice will listen to serve incoming requests."
+        ),
+    ]
+    reloading: Annotated[
+        bool,
+        Field(
+            description="To enable auto-reloading on source code changes during development."
+        ),
+    ] = False
+
+
+class Keycloak(BaseModel):
+    server_url: Annotated[HttpUrl, Field(description="Keycloak server url.")]
+    realm_name: Annotated[
+        str,
+        Field(
+            description="""Realm where you manage objects, including users, clients,
+            roles, and groups. Note: only applications in a same realm can use SSO."""
+        ),
+    ]
+    client_id: Annotated[
+        str,
+        Field(
+            description="""Keycloak client which will be used for authentication and
+            authorization in order to secure the microservice. NOTE: Two microservices
+            should not use the same client."""
+        ),
+    ]
+    client_secret_key: Annotated[
+        str,
+        Field(
+            description="""The secret which allows the client to prove its identity to the
+            Keycloak server. NOTE: It should be known only to the application and the
+            authorization server"""
+        ),
+    ]
+
+    @computed_field
+    def authorization_url(self) -> str:
+        """Client application redirects users to this url in order to authenticate them."""
+        return (
+            f"{self.server_url}/realms/{self.realm_name}/protocol/openid-connect/auth"
+        )
+
+    @computed_field
+    def token_url(self) -> str:
+        """It is used to fetch a token from the keycloak."""
+        return (
+            f"{self.server_url}/realms/{self.realm_name}/protocol/openid-connect/token"
+        )
+
+
+class AppSettings(BaseSettings):
+    ms: Microservice
+    keycloak: Keycloak
+
+    model_config = SettingsConfigDict(
+        extra="ignore", case_sensitive=False, env_nested_delimiter="__", env_file=".env"
+    )
+
+
+@lru_cache
+def get_settings(
+    settings_type: type[TSettings] | None = None,
+    is_env_file_required: bool = True,
+    **kwargs: Any,
+) -> TSettings:
+    if settings_type is None:
+        settings_type = cast(type[TSettings], AppSettings)
+
+    if issubclass(settings_type, AppSettings) is False:
+        raise MSCoreUserError(
+            "The `settings_type` argument must be a subclass of pydanitc `BaseSettings` class."
+        )
+
+    if is_env_file_required:
+        env_file_path = Path(settings_type.model_config.get("env_file"))
+        try:
+            env_file_path.resolve(strict=True)
+        except FileNotFoundError as ex:
+            raise MSCoreUserError(f"File {env_file_path} is required.") from ex
+
+    return settings_type(**kwargs)
