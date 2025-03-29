@@ -1,4 +1,4 @@
-name: bharatpro
+name: proseva
 services:
   #
   # core backend services
@@ -7,9 +7,6 @@ services:
   # iam-service:
   #   image: python:
   #   container_name: iam # Identity and Access Management (IAM)
-
-
-
 
 
   #
@@ -27,6 +24,40 @@ services:
       - --import-realm
     volumes:
       - keycloak-data:/opt/keycloak/data/
+    networks:
+      - private-net
+
+  #
+  # databases
+  #
+  listing-db:
+    image: postgres:17.4-alpine
+    container_name: db-listing
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=${LISTING_DB_USER}
+      - POSTGRES_PASSWORD=${LISTING_DB_PASSWORD}
+      - POSTGRES_DB=listing
+    volumes:
+      - db-listing-vol:/var/lib/postgresql/data
+    networks:
+      - private-net
 
 volumes:
+  #
+  # database volumes
+  #
+  db-listing-vol:
+    driver: local
   keycloak-data:
+
+networks:
+  private-net:
+    name: proseva-private-net
+    driver_opts:
+      com.docker.network.bridge.name: br-proseva
+    ipam:
+      config:
+        - subnet: ${PROSEVA_PRIVATE_NET}
