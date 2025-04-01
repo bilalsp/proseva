@@ -2,15 +2,28 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Annotated, Any, TypeVar, cast
 
-from pydantic import BaseModel, Field, HttpUrl, computed_field
+from pydantic import (
+    BaseModel,
+    Field,
+    HttpUrl,
+    computed_field,
+)
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from mscore.db import DatabaseSettings
 from mscore.errors import MSCoreUserError
 
 TSettings = TypeVar("TSettings", bound=BaseSettings)
 
 
-class Microservice(BaseModel):
+__all__ = [
+    "MicroServiceSettings",
+    "DatabaseSettings",
+]
+
+
+class MicroServiceSettings(BaseSettings):
+    name: Annotated[str, Field(description="Microservice's name.")]
     port: Annotated[
         int,
         Field(
@@ -23,8 +36,17 @@ class Microservice(BaseModel):
             description="To enable auto-reloading on source code changes during development."
         ),
     ] = False
+    debug: Annotated[
+        bool,
+        Field(
+            description="To enable debugging on service to get verbose logs during development."
+        ),
+    ] = False
 
 
+#
+# auth
+#
 class Keycloak(BaseModel):
     server_url: Annotated[HttpUrl, Field(description="Keycloak server url.")]
     realm_name: Annotated[
@@ -66,9 +88,13 @@ class Keycloak(BaseModel):
         )
 
 
-class AppSettings(BaseSettings):
-    ms: Microservice
-    keycloak: Keycloak
+#
+# db
+#
+
+
+class BaseAppSettings(BaseSettings):
+    ms: MicroServiceSettings
 
     model_config = SettingsConfigDict(
         extra="ignore", case_sensitive=False, env_nested_delimiter="__", env_file=".env"
@@ -82,9 +108,9 @@ def get_settings(
     **kwargs: Any,
 ) -> TSettings:
     if settings_type is None:
-        settings_type = cast(type[TSettings], AppSettings)
+        settings_type = cast(type[TSettings], BaseAppSettings)
 
-    if issubclass(settings_type, AppSettings) is False:
+    if issubclass(settings_type, BaseAppSettings) is False:
         raise MSCoreUserError(
             "The `settings_type` argument must be a subclass of pydanitc `BaseSettings` class."
         )

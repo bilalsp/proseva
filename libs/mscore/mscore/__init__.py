@@ -1,7 +1,8 @@
 from fastapi import FastAPI
+from starlette.types import Lifespan
 
-from mscore.lifespan import KeycloakOpenIDLifespan, LifespanManager
-from mscore.settings import AppSettings
+from mscore.settings import BaseAppSettings
+from mscore.types import AppType
 from mscore.utils import get_project_version
 
 __all__ = [
@@ -9,7 +10,9 @@ __all__ = [
 ]
 
 
-def create_app(settings: AppSettings) -> FastAPI:
+def create_app(
+    settings: BaseAppSettings, /, lifespan: Lifespan[AppType] | None = None
+) -> AppType:
     """Create a FastAPI application.
 
     Args:
@@ -18,25 +21,27 @@ def create_app(settings: AppSettings) -> FastAPI:
     Returns:
         An instance of FastAPI application.
     """
-    lifespan_manager = LifespanManager(
-        [
-            KeycloakOpenIDLifespan(
-                **settings.keycloak.model_dump(
-                    exclude={"authorization_url", "token_url"}, mode="json"
-                )
-            ),
-        ]
-    )
+    # from mscore.lifespan import KeycloakOpenIDLifespan, LifespanManager
+    # lifespan_manager = LifespanManager(
+    #     [
+    #         KeycloakOpenIDLifespan(
+    #             **settings.keycloak.model_dump(
+    #                 exclude={"authorization_url", "token_url"}, mode="json"
+    #             )
+    #         ),
+    #     ]
+    # )
 
     app = FastAPI(
         # title=
         # description=
         # summary=
         version=get_project_version("pyproject.toml"),
-        lifespan=lifespan_manager,
+        # lifespan=lifespan_manager,
         swagger_ui_init_oauth={
-            "clientId": f"{settings.keycloak.client_id}-swagger-ui",
+            # "clientId": f"{settings.keycloak.client_id}-swagger-ui",
             "usePkceWithAuthorizationCodeGrant": True,
         },
+        lifespan=lifespan,
     )
     return app

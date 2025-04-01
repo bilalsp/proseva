@@ -7,7 +7,9 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.11"
-fastapi = "^0.110.0"
+fastapi = "^0.115.12"
+SQLAlchemy = {version = "^2.0.40", extras = ["asyncpg"]}
+asyncpg = "0.30.0"
 python-keycloak = "^3.9.1"
 pydantic_settings = "^2.2.1"
 toml = "^0.10.2"
@@ -16,13 +18,13 @@ types-toml = "^0.10"
 # used by main.py
 #
 python-multipart = "^0.0.9"
-uvicorn = "^0.27.1"
 python-jose = {version = "^3.3.0", extras = ["cryptography"]}
 
 [tool.poetry.group.dev]
 optional = true
 
 [tool.poetry.group.dev.dependencies]
+uvicorn = "^0.27.1"
 pre-commit = "^3.6.0"
 ruff = "^0.2.1"
 mypy = "^1.9.0"
