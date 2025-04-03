@@ -32,12 +32,6 @@ def get_project_version(file_path: str) -> str:
         ) from None
 
 
-def read_json_file(file_path: str) -> dict:
-    """Read a json file."""
-    with open(file_path) as file:
-        return json.load(file)
-
-
 @lru_cache
 def get_openapi_examples(examples_file: str, /) -> dict:
     """Get OpenAPI examples for the given examples-file.
@@ -53,7 +47,8 @@ def get_openapi_examples(examples_file: str, /) -> dict:
     """
     examples_dir = "./examples"
     examples_file_path = os.path.join(examples_dir, f"{examples_file}.json")
-    return read_json_file(file_path=examples_file_path)
+    return json.load(open(examples_file_path, "r", encoding="utf-8"))
+
 
 
 # #
