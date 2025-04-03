@@ -1,3 +1,9 @@
 {
-
+    "create_sample_listing": {
+        "summary": "Create a sample listing",
+        "description": "",
+        "value": {
+            "title": "Girl's necklace"
+        }
+    }
 }

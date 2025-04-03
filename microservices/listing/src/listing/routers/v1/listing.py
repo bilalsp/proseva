@@ -1,6 +1,8 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Query, Depends, status
+from fastapi import APIRouter, Query, Depends, Body, status
+
+from mscore.utils import get_openapi_examples
 
 from listing.dto.requests import ListingCreateReqDTO
 from listing.dto.responses import ListingCreateResDTO
@@ -11,7 +13,15 @@ listing_router = APIRouter()
 
 @listing_router.post("", status_code=status.HTTP_201_CREATED)
 async def create_listing(
-    dto: ListingCreateReqDTO, service: Annotated[ListingService, Depends()]
+    dto: Annotated[
+        ListingCreateReqDTO,
+        Body(
+            ...,
+            openapi_examples=get_openapi_examples("v1_listing_post"),
+            description="Request body to create a lisiting.",
+        ),
+    ],
+    service: Annotated[ListingService, Depends()],
 ) -> ListingCreateResDTO:
     """Create a new listing."""
     return await service.create_listing(dto=dto)

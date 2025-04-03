@@ -2,7 +2,9 @@ from pydantic import BaseModel, Field
 
 
 class ListingCreateReqDTO(BaseModel):
-    title: str = Field(..., min_length=10, max_length=250, examples=["Children's bracelet"])
+    title: str = Field(
+        ..., min_length=10, max_length=250, examples=["Children's bracelet"]
+    )
     # description: str = Field(..., max_length=2000)
     # category_id: int
     # base_price: float = Field(..., gt=0)
