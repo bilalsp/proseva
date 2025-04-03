@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Mapped, mapped_column
 import sqlalchemy as sa
 
-from listing.orm.base import BaseModel
+from .base import BaseModel
 
 
 class ListingModel(BaseModel):

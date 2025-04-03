@@ -1,4 +1,4 @@
-from listing.orm.listing import ListingModel
+from .listing import ListingModel
 
 
 __all__ = [

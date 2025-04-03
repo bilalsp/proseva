@@ -11,7 +11,7 @@ listing_router = APIRouter()
 
 @listing_router.post("", status_code=status.HTTP_201_CREATED)
 async def create_listing(
-    dto: ListingCreateReqDTO, service: ListingService = Depends()
+    dto: ListingCreateReqDTO, service: Annotated[ListingService, Depends()]
 ) -> ListingCreateResDTO:
     """Create a new listing."""
     return await service.create_listing(dto=dto)

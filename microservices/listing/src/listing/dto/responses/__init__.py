@@ -1,4 +1,4 @@
-from listing.dto.responses.listing import ListingCreateResDTO
+from .listing import ListingCreateResDTO
 
 
 __all__ = [
