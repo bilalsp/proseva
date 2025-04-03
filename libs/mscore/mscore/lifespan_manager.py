@@ -1,20 +1,20 @@
 from __future__ import annotations
 
 from contextlib import AsyncExitStack, asynccontextmanager
-from typing import Any, AsyncContextManager, AsyncIterator, Callable, TypeAlias
+from typing import Any, AsyncIterator, Self
 
 from fastapi import FastAPI
+from starlette.types import Lifespan
 
-TAppState: TypeAlias = dict[str, Any]
-TLifespan: TypeAlias = Callable[[FastAPI], AsyncContextManager[TAppState]]
+from mscore.types import AppStateType, AppType
 
 
 class LifespanManager:
-    def __init__(self, lifespans: list[TLifespan] | None = None, /) -> None:
+    def __init__(self, lifespans: list[Lifespan[AppType]] | None = None, /) -> None:
         self.lifespans = lifespans or []
 
     @asynccontextmanager
-    async def __call__(self, app: FastAPI) -> AsyncIterator[TAppState]:
+    async def __call__(self, app: FastAPI) -> AsyncIterator[AppStateType]:
         state: dict[str, Any] = {}
         async with AsyncExitStack() as exit_stack:
             for lifespan in self.lifespans:
@@ -23,7 +23,7 @@ class LifespanManager:
                     state.update(sub_state)
             yield state
 
-    def add(self, lifespans: TLifespan | list[TLifespan]) -> LifespanManager:
+    def add(self, lifespans: Lifespan[AppType] | list[Lifespan[AppType]]) -> Self:
         if not isinstance(lifespans, list):
             lifespans = [lifespans]
         self.lifespans.extend(lifespans)
