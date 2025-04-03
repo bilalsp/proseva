@@ -10,6 +10,7 @@ package-mode = true
 python = "^3.11"
 fastapi = "^0.115.12"
 pydantic = "^2.10.6"
+alembic = "^1.15.2"
 mscore = {path = "../../libs/mscore", develop = true}
 
 [tool.poetry.group.dev]
