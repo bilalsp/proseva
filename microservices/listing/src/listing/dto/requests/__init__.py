@@ -1,4 +1,4 @@
-from listing.dto.requests.crud import ListingCreateReqDTO
+from listing.dto.requests.listing import ListingCreateReqDTO
 
 
 __all__ = [

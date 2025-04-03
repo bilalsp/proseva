@@ -3,7 +3,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text
 
 from mscore.db import get_db_session
+
 from listing.dto.requests import ListingCreateReqDTO
+from listing.dto.responses import ListingCreateResDTO
+from listing.orm import ListingModel
 
 
 class ListingDAO:
@@ -12,7 +15,9 @@ class ListingDAO:
     ):
         self.session = session
 
-    async def create_listing(self, dto: ListingCreateReqDTO):
+    async def create_listing(self, dto: ListingCreateReqDTO) -> ListingCreateResDTO:
         """Create a new listing."""
-        result = await self.session.execute(text("SELECT 10*23;"))
-        return result.scalar()
+        listing = ListingModel(**dto.model_dump())
+        self.session.add(listing)
+        await self.session.commit()
+        return ListingCreateResDTO(id=listing.id)

@@ -3,13 +3,16 @@ from typing import Annotated
 from fastapi import APIRouter, Query, Depends, status
 
 from listing.dto.requests import ListingCreateReqDTO
+from listing.dto.responses import ListingCreateResDTO
 from listing.services import ListingService
 
 listing_router = APIRouter()
 
 
 @listing_router.post("", status_code=status.HTTP_201_CREATED)
-async def create_listing(dto: ListingCreateReqDTO, service: ListingService = Depends()):
+async def create_listing(
+    dto: ListingCreateReqDTO, service: ListingService = Depends()
+) -> ListingCreateResDTO:
     """Create a new listing."""
     return await service.create_listing(dto=dto)
 
