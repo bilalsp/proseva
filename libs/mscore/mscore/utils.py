@@ -3,6 +3,9 @@
 #
 # import inspect
 # from typing import Any
+import json
+import os
+from functools import lru_cache
 
 import toml
 
@@ -27,6 +30,30 @@ def get_project_version(file_path: str) -> str:
         raise Exception(
             f"Error occurred while reading the project version from {file_path}: {ex}"
         ) from None
+
+
+def read_json_file(file_path: str) -> dict:
+    """Read a json file."""
+    with open(file_path) as file:
+        return json.load(file)
+
+
+@lru_cache
+def get_openapi_examples(examples_file: str, /) -> dict:
+    """Get OpenAPI examples for the given examples-file.
+
+    Args:
+        examples_file: example file without `.json` extension.
+
+    Returns:
+        example dictionary.
+
+    NOTE: It assumes that OpenAPI examples have been stored inside
+        `examples` subdirectory at the project root.
+    """
+    examples_dir = "./examples"
+    examples_file_path = os.path.join(examples_dir, f"{examples_file}.json")
+    return read_json_file(file_path=examples_file_path)
 
 
 # #
