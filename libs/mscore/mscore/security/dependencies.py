@@ -5,8 +5,12 @@ from fastapi.security import OAuth2AuthorizationCodeBearer
 from jwcrypto.jwt import JWException
 from pydantic import ValidationError
 
-from mscore.errors import AuthenticationRequiredError, ForbiddenError, InvalidTokenError
 from mscore.schemas import CurrentUser, KeycloakState
+from mscore.security._errors import (
+    AuthenticationRequiredError,
+    ForbiddenError,
+    InvalidTokenError,
+)
 from mscore.security.rlac import (
     Authenticated,
     Everyone,

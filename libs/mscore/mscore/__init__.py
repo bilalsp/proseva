@@ -1,6 +1,9 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, HTTPException, status
+from fastapi.exceptions import RequestValidationError
 from starlette.types import Lifespan
+from starlette.middleware import Middleware
 
+from mscore.errors import ErrorHandlingMiddleware, ErrorResponsesBuilder
 from mscore.settings import BaseAppSettings
 from mscore.types import AppType
 from mscore.utils import get_project_version
@@ -21,6 +24,48 @@ def create_app(
     Returns:
         An instance of FastAPI application.
     """
+
+    async def _re_raise_exception(_: Request, exc: Exception):
+        """Re-raise an exception to handle it inside `ErrorHandlingMiddleware`."""
+        raise exc
+
+    # create an ASGI application
+    app = FastAPI(
+        # title=
+        # description=
+        # summary=
+        version=get_project_version("pyproject.toml"),
+        lifespan=lifespan,
+        exception_handlers={
+            # handle all exceptions inside `ErrorHandlingMiddleware`
+            HTTPException: _re_raise_exception,
+            # RequestValidationError: _re_raise_exception,
+        },
+        middleware=[Middleware(ErrorHandlingMiddleware, settings.ms)],
+        responses=ErrorResponsesBuilder(settings=settings.ms).build(
+            status_codes=[
+                status.HTTP_400_BAD_REQUEST,
+                status.HTTP_401_UNAUTHORIZED,
+                status.HTTP_403_FORBIDDEN,
+                status.HTTP_404_NOT_FOUND,
+                status.HTTP_412_PRECONDITION_FAILED,
+                status.HTTP_422_UNPROCESSABLE_ENTITY,
+                status.HTTP_500_INTERNAL_SERVER_ERROR,
+            ],
+        ),
+        swagger_ui_init_oauth={
+            # "clientId": f"{settings.keycloak.client_id}-swagger-ui",
+            "usePkceWithAuthorizationCodeGrant": True,
+        },
+    )
+
+    # from mscore.errors._middlewares import LifespanLoggerMiddleware
+
+    # app.add_middleware(LifespanLoggerMiddleware)
+
+    # from mscore.errors._middlewares import ErrorHandlingMiddleware2
+
+    # app.add_middleware(ErrorHandlingMiddleware2)
     # from mscore.lifespan import KeycloakOpenIDLifespan, LifespanManager
     # lifespan_manager = LifespanManager(
     #     [
@@ -32,16 +77,4 @@ def create_app(
     #     ]
     # )
 
-    app = FastAPI(
-        # title=
-        # description=
-        # summary=
-        version=get_project_version("pyproject.toml"),
-        # lifespan=lifespan_manager,
-        swagger_ui_init_oauth={
-            # "clientId": f"{settings.keycloak.client_id}-swagger-ui",
-            "usePkceWithAuthorizationCodeGrant": True,
-        },
-        lifespan=lifespan,
-    )
     return app

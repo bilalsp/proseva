@@ -1,3 +1,4 @@
+from enum import Enum
 from functools import lru_cache
 from pathlib import Path
 from typing import Annotated, Any, TypeVar, cast
@@ -11,7 +12,7 @@ from pydantic import (
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from mscore.db import DatabaseSettings
-from mscore.errors import MSCoreUserError
+from mscore.security._errors import MSCoreUserError
 
 TSettings = TypeVar("TSettings", bound=BaseSettings)
 
@@ -22,6 +23,12 @@ __all__ = [
 ]
 
 
+class Environment(str, Enum):
+    DEVELOPMENT = "development"
+    RELEASE = "release"
+    PRODUCTION = "production"
+
+
 class MicroServiceSettings(BaseSettings):
     name: Annotated[str, Field(description="Microservice's name.")]
     port: Annotated[
@@ -29,6 +36,9 @@ class MicroServiceSettings(BaseSettings):
         Field(
             description="The port where the microservice will listen to serve incoming requests."
         ),
+    ]
+    environment: Annotated[
+        Environment, Field(description="Microservice's environment.")
     ]
     reloading: Annotated[
         bool,

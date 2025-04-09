@@ -47,8 +47,7 @@ def get_openapi_examples(examples_file: str, /) -> dict:
     """
     examples_dir = "./examples"
     examples_file_path = os.path.join(examples_dir, f"{examples_file}.json")
-    return json.load(open(examples_file_path, "r", encoding="utf-8"))
-
+    return json.load(open(examples_file_path, encoding="utf-8"))
 
 
 # #

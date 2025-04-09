@@ -25,7 +25,7 @@ class BaseDatabaseManager(ABC):
         ...
 
     @abstractmethod
-    def session(self) -> AsyncSession:
+    def session(self) -> AsyncGenerator[AsyncSession, None]:
         ...
 
 

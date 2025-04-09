@@ -3,7 +3,7 @@ from typing import Callable
 from fastapi import APIRouter, Depends
 
 from mscore import create_app
-from mscore.dependencies import AuthenticationRequired, RowLevelSecurity
+from mscore.security.dependencies import AuthenticationRequired, RowLevelSecurity
 from mscore.security.rlac import ACE, Action, Authenticated, Everyone
 from mscore.settings import AppSettings, get_settings
 
