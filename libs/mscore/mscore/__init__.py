@@ -1,7 +1,6 @@
-from fastapi import FastAPI, Request, HTTPException, status
-from fastapi.exceptions import RequestValidationError
-from starlette.types import Lifespan
+from fastapi import FastAPI, HTTPException, Request, status
 from starlette.middleware import Middleware
+from starlette.types import Lifespan
 
 from mscore.errors import ErrorHandlingMiddleware, ErrorResponsesBuilder
 from mscore.settings import BaseAppSettings

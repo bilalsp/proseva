@@ -23,7 +23,7 @@ class ErrorHandlingMiddleware:
         if scope["type"] != "http":
             await self.app(scope, receive, send)
             return
-    
+
         try:
             request = Request(scope)
             await self.app(scope, receive, send)
