@@ -1,5 +1,3 @@
-from fastapi import APIRouter
-
 from mscore import create_app
 from mscore.settings import get_settings
 from mscore.lifespan_manager import LifespanManager
@@ -18,8 +16,5 @@ lifespan = LifespanManager(
 
 app = create_app(settings, lifespan=lifespan)
 
-# router
-api_router = APIRouter()
-api_router.include_router(v1_router, prefix="/v1")
-
-app.include_router(router=api_router)
+app.root_path = "/api/v1"
+app.include_router(v1_router)

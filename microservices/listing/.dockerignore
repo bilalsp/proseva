@@ -1,0 +1,3 @@
+# .dockerignore
+.ruff_cache
+.venv
