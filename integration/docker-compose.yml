@@ -3,6 +3,77 @@ services:
   #
   # core backend services
   #
+  lisiting-microservice:
+    image: lisiting-microservice
+    build:
+      context: "../microservices/listing"
+      args:
+        - GITHUB_USERNAME=${GITHUB_USERNAME}
+        - GITHUB_TOKEN=${GITHUB_TOKEN}
+        - MY_UID=${MY_UID}
+        - MY_USERNAME=${MY_USERNAME}
+        - MY_GID=${MY_GID}
+        - MY_GROUP=${MY_GROUP}
+    hostname: mbansari.proseva.in
+    container_name: microservice-listing
+    depends_on:
+      listing-db:
+        condition: service_healthy
+        # restart: true # TODO: restart is not support in current version. [upgrade docker-engine] 
+    ports:
+      - 9000:80
+    # volumes:
+    #   - "/var/log/listing-microservice:/var/log/listing-microservice"
+    networks:
+      - private-net
+    # healthcheck: # TODO: define health-check route..
+    #   test: ["executable", "arg"]
+    #   interval: 1m30s
+    #   timeout: 30s
+    #   retries: 5
+    #   start_period: 30s
+  #
+  # databases
+  #
+  listing-db:
+    image: postgres:17.4-alpine
+    container_name: db-listing
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=${LISTING_DB_USER}
+      - POSTGRES_PASSWORD=${LISTING_DB_PASSWORD}
+      - POSTGRES_DB=listing
+    volumes:
+      - db-listing-vol:/var/lib/postgresql/data
+    networks:
+      - private-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${LISTING_DB_USER} -d listing"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+
+volumes:
+  #
+  # database volumes
+  #
+  db-listing-vol:
+    driver: local
+  keycloak-data:
+
+networks:
+  private-net:
+    name: proseva-private-net
+    driver_opts:
+      com.docker.network.bridge.name: br-proseva
+    ipam:
+      config:
+        - subnet: ${PROSEVA_PRIVATE_NET}
+
+
 
   # iam-service:
   #   image: python:
@@ -27,37 +98,4 @@ services:
   #   networks:
   #     - private-net
 
-  #
-  # databases
-  #
-  listing-db:
-    image: postgres:17.4-alpine
-    container_name: db-listing
-    restart: always
-    ports:
-      - 5432:5432
-    environment:
-      - POSTGRES_USER=${LISTING_DB_USER}
-      - POSTGRES_PASSWORD=${LISTING_DB_PASSWORD}
-      - POSTGRES_DB=listing
-    volumes:
-      - db-listing-vol:/var/lib/postgresql/data
-    networks:
-      - private-net
-
-volumes:
-  #
-  # database volumes
-  #
-  db-listing-vol:
-    driver: local
-  keycloak-data:
-
-networks:
-  private-net:
-    name: proseva-private-net
-    driver_opts:
-      com.docker.network.bridge.name: br-proseva
-    ipam:
-      config:
-        - subnet: ${PROSEVA_PRIVATE_NET}
+    # command: tail -f /dev/null
