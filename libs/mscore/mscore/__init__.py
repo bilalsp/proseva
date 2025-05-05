@@ -57,23 +57,23 @@ def create_app(
             "usePkceWithAuthorizationCodeGrant": True,
         },
     )
-
-    # from mscore.errors._middlewares import LifespanLoggerMiddleware
-
-    # app.add_middleware(LifespanLoggerMiddleware)
-
-    # from mscore.errors._middlewares import ErrorHandlingMiddleware2
-
-    # app.add_middleware(ErrorHandlingMiddleware2)
-    # from mscore.lifespan import KeycloakOpenIDLifespan, LifespanManager
-    # lifespan_manager = LifespanManager(
-    #     [
-    #         KeycloakOpenIDLifespan(
-    #             **settings.keycloak.model_dump(
-    #                 exclude={"authorization_url", "token_url"}, mode="json"
-    #             )
-    #         ),
-    #     ]
-    # )
-
     return app
+
+
+# from mscore.errors._middlewares import LifespanLoggerMiddleware
+
+# app.add_middleware(LifespanLoggerMiddleware)
+
+# from mscore.errors._middlewares import ErrorHandlingMiddleware2
+
+# app.add_middleware(ErrorHandlingMiddleware2)
+# from mscore.lifespan import KeycloakOpenIDLifespan, LifespanManager
+# lifespan_manager = LifespanManager(
+#     [
+#         KeycloakOpenIDLifespan(
+#             **settings.keycloak.model_dump(
+#                 exclude={"authorization_url", "token_url"}, mode="json"
+#             )
+#         ),
+#     ]
+# )

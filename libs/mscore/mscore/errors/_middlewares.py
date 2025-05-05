@@ -9,6 +9,7 @@ from mscore.errors._error_responses import (
     convert_status_code_to_text,
 )
 from mscore.errors._exceptions import HTTPCustomError
+from mscore.logging import get_logger
 from mscore.settings import MicroServiceSettings
 
 ErrorMediaType = "application/problem+json"
@@ -67,3 +68,14 @@ class ErrorHandlingMiddleware:
             )
 
         # except RequestValidationError as ex:
+
+        except BaseException as ex:
+            logger = get_logger()
+
+            logger.exception(ex)
+
+            response = JSONResponse(
+                content="BaseException",
+                status_code=500,
+            )
+            await response(scope, receive, send)

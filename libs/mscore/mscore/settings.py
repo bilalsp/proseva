@@ -1,7 +1,7 @@
 from enum import Enum
 from functools import lru_cache
 from pathlib import Path
-from typing import Annotated, Any, TypeVar, cast
+from typing import Annotated, Any, Literal, TypeVar, cast
 
 from pydantic import (
     BaseModel,
@@ -37,8 +37,22 @@ class MicroServiceSettings(BaseSettings):
             description="The port where the microservice will listen to serve incoming requests."
         ),
     ]
+    num_workers: Annotated[
+        int,
+        Field(
+            description="The number of worker processes to handle incoming requests concurrently."
+        ),
+    ] = 1
     environment: Annotated[
         Environment, Field(description="Microservice's environment.")
+    ]
+    log_level: Annotated[
+        Literal["TRACE", "DEBUG", "INFO", "SUCCESS", "WARNING", "ERROR", "CRITICAL"],
+        Field(
+            description="Defines the minimum severity of log messages to be captured. "
+            "Lower levels like 'DEBUG' or 'TRACE' are useful during development, "
+            "while higher levels like 'ERROR' or 'CRITICAL' are better suited for production."
+        ),
     ]
     reloading: Annotated[
         bool,
