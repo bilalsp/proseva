@@ -3,8 +3,8 @@ import logging
 import sys
 
 from loguru import logger
-from loguru._logger import Logger
 
+from mscore.contexts import get_request_id
 from mscore.settings import MicroServiceSettings
 
 LOGURU_FORMAT = (
@@ -44,7 +44,7 @@ class InterceptHandler(logging.Handler):
 
 
 def record_patcher(record: dict) -> dict:
-    record["request_id"] = "<REQUEST_ID>"
+    record["request_id"] = get_request_id()
     return record
 
 
@@ -73,11 +73,3 @@ def setup_logging(settings: MicroServiceSettings) -> None:
         logging.getLogger(name).propagate = True
 
     logger.enable(LIBRARY_NAME)
-
-
-def get_logger() -> Logger:
-    """Return a loguru logger bound with the current module name.
-
-    NOTE: Use inside any module to get a contextual logger.
-    """
-    return logger.bind(module=__name__)

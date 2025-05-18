@@ -30,11 +30,11 @@ class DatabaseSettings(BaseSettings):
         ),
     ] = 0
     echo: Annotated[
-        bool,
+        bool | None,
         Field(
             description="When echo=True, SQLAlchemy will print out all the SQL statements it executes."
         ),
-    ] = False
+    ] = None
     application_name: Annotated[
         str,
         Field(

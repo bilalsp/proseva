@@ -1,8 +1,11 @@
 from fastapi import FastAPI, HTTPException, Request, status
+from fastapi.exceptions import RequestValidationError
 from starlette.middleware import Middleware
 from starlette.types import Lifespan
 
-from mscore.errors import ErrorHandlingMiddleware, ErrorResponsesBuilder
+from mscore.errors import ErrorResponsesBuilder
+from mscore.logging import setup_logging
+from mscore.middlewares import ErrorHandlingMiddleware, RequestIdMiddleware
 from mscore.settings import BaseAppSettings
 from mscore.types import AppType
 from mscore.utils import get_project_version
@@ -38,9 +41,12 @@ def create_app(
         exception_handlers={
             # handle all exceptions inside `ErrorHandlingMiddleware`
             HTTPException: _re_raise_exception,
-            # RequestValidationError: _re_raise_exception,
+            RequestValidationError: _re_raise_exception,
         },
-        middleware=[Middleware(ErrorHandlingMiddleware, settings.ms)],
+        middleware=[
+            Middleware(RequestIdMiddleware),
+            Middleware(ErrorHandlingMiddleware, settings.ms),
+        ],
         responses=ErrorResponsesBuilder(settings=settings.ms).build(
             status_codes=[
                 status.HTTP_400_BAD_REQUEST,
@@ -57,6 +63,9 @@ def create_app(
             "usePkceWithAuthorizationCodeGrant": True,
         },
     )
+
+    setup_logging(settings=settings.ms)
+
     return app
 
 
