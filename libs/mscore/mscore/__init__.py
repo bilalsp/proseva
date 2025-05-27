@@ -1,3 +1,5 @@
+from typing import Callable
+
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.exceptions import RequestValidationError
 from starlette.middleware import Middleware
@@ -6,6 +8,7 @@ from starlette.types import Lifespan
 from mscore.errors import ErrorResponsesBuilder
 from mscore.logging import setup_logging
 from mscore.middlewares import ErrorHandlingMiddleware, RequestIdMiddleware
+from mscore.monitoring.health import get_health_router
 from mscore.settings import BaseAppSettings
 from mscore.types import AppType
 from mscore.utils import get_project_version
@@ -16,12 +19,17 @@ __all__ = [
 
 
 def create_app(
-    settings: BaseAppSettings, /, lifespan: Lifespan[AppType] | None = None
+    settings: BaseAppSettings,
+    /,
+    lifespan: Lifespan[AppType] | None = None,
+    health_checks: list[Callable] | None = None,
 ) -> AppType:
     """Create a FastAPI application.
 
     Args:
         settings: it is used to configure the application.
+        lifespan:
+        health_checks:
 
     Returns:
         An instance of FastAPI application.
@@ -31,8 +39,11 @@ def create_app(
         """Re-raise an exception to handle it inside `ErrorHandlingMiddleware`."""
         raise exc
 
+    # from fastapi.openapi.models import Server
+
     # create an ASGI application
     app = FastAPI(
+        # servers=[ {"url": "/api/v1", "description": "Main API (v1)"}],
         # title=
         # description=
         # summary=
@@ -63,6 +74,10 @@ def create_app(
             "usePkceWithAuthorizationCodeGrant": True,
         },
     )
+
+    # monitoring router
+    health_router = get_health_router(health_checks=health_checks)
+    app.include_router(health_router, tags=["Monitoring"])
 
     setup_logging(settings=settings.ms)
 
