@@ -43,6 +43,14 @@ class DatabaseSettings(BaseSettings):
             """
         ),
     ] = ""
+    timeout: Annotated[
+        str,
+        Field(
+            description="""Connection timeout in seconds. If the database does not respond within this time, 
+            the operation will fail with a timeout error.
+            """
+        ),
+    ] = "5"
 
     @field_validator("url")
     def check_db_name(cls, url: PostgresDsn) -> PostgresDsn:

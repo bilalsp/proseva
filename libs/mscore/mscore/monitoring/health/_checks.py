@@ -1,3 +1,4 @@
+import socket
 from typing import Callable
 
 from fastapi import Depends
@@ -7,6 +8,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ...db import get_db_session
 from ._dto import HealthCheckResult, HealthStatus
+
+NETWORK_ERRORS = (socket.gaierror, ConnectionRefusedError, TimeoutError, OSError)
 
 
 def db_check(db_name: str) -> Callable:
@@ -29,6 +32,12 @@ def db_check(db_name: str) -> Callable:
         except SQLAlchemyError as ex:
             return HealthCheckResult(
                 name=check_name, status=HealthStatus.ERROR, detail=str(ex)
+            )
+        except NETWORK_ERRORS:
+            return HealthCheckResult(
+                name=check_name,
+                status=HealthStatus.ERROR,
+                detail=f"The {db_name} database is unreachable.",
             )
 
     depends.__name__ = check_name
