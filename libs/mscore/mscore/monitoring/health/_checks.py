@@ -5,8 +5,7 @@ from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from mscore.db import get_db_session
-
+from ...db import get_db_session
 from ._dto import HealthCheckResult, HealthStatus
 
 
