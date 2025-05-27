@@ -25,8 +25,8 @@ graceful_timeout = 30  # Graceful restart timeout
 daemon = False
 
 # Logging
-accesslog = "/var/log/listing-microservice/access.log"
-errorlog = "/var/log/listing-microservice/error.log"
+accesslog = "-"  # log to stdout
+errorlog = "-"  # log to stderr
 
 
 def on_starting(server: Arbiter) -> None:

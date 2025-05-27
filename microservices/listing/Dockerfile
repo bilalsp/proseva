@@ -77,10 +77,6 @@ FROM python-base as runtime
 ARG MY_USERNAME
 WORKDIR /opt/proseva/microservices/listing
 ENV PYTHONPATH="src:${PYTHONPATH}"
-
-RUN mkdir -p /var/log/listing-microservice
-RUN chown -R ${MY_USERNAME}:${MY_GROUP} /var/log/listing-microservice
-
 COPY --from=builder $VENV_PATH $VENV_PATH
 COPY . ./
 EXPOSE 80

@@ -25,14 +25,16 @@ async def create_listing(
     service: Annotated[ListingService, Depends()],
 ) -> ListingCreateResDTO:
     """Create a new listing."""
-    print("creating...")
+    # raise Exception("base erro testing..")
+    # print("creating...")
+
+    # from mscore.errors import HTTPCustomError
+    # raise HTTPCustomError(status_code=500)
+
     # 34/0
     res = await service.create_listing(dto=dto)
     print("created..")
     return res
-
-
-
 
 
 class Message(BaseModel):

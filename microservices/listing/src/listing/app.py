@@ -1,6 +1,7 @@
 from mscore import create_app
 from mscore.settings import get_settings
 from mscore.lifespan_manager import LifespanManager
+from mscore.monitoring.health import db_check
 from mscore.db import DatabaseLifespan, PostgresDatabaseManager
 
 from listing.settings import AppSettings
@@ -14,7 +15,7 @@ lifespan = LifespanManager(
     ]
 )
 
-app = create_app(settings, lifespan=lifespan)
+app = create_app(settings, lifespan=lifespan, health_checks=[db_check("listing")])
 
 app.root_path = "/api/v1"
 app.include_router(v1_router)

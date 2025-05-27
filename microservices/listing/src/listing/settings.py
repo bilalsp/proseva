@@ -15,7 +15,7 @@ class AppSettings(BaseAppSettings):
     def auto_set_values(self) -> Self:
         """preset some values."""
         #
-        self.db.listing.echo = self.ms.debug or self.db.listing.echo
+        self.db.listing.echo = self.db.listing.echo  # or self.ms.debug
 
         # set app name for database connection
         if self.db.listing.application_name == "":

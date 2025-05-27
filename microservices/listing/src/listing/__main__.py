@@ -1,16 +1,14 @@
 import uvicorn
 
 from mscore.settings import get_settings
-from mscore.logging import setup_logging, get_logger
 from listing.settings import AppSettings
 
 settings: AppSettings = get_settings(AppSettings)
-logger = get_logger()
 
 
 def runserver():
     # setup logging just before starting the server to make sure no library overwrites it
-    setup_logging(settings=settings.ms)
+    # setup_logging(settings=settings.ms)
 
     uvicorn.run(
         app="listing.app:app",
