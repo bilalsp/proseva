@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 from contextlib import AsyncExitStack, asynccontextmanager
-from typing import Any, AsyncIterator, Self
+from typing import TYPE_CHECKING, Any, AsyncIterator, Self
 
 from fastapi import FastAPI
 from starlette.types import Lifespan
 
-from mscore.types import AppStateType, AppType
+if TYPE_CHECKING:
+    from mscore.types import AppStateType, AppType
 
 
 class LifespanManager:

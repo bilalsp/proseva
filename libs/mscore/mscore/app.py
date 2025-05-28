@@ -1,4 +1,6 @@
-from typing import Callable
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Callable
 
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.exceptions import RequestValidationError
@@ -6,18 +8,21 @@ from starlette.middleware import Middleware
 from starlette.types import Lifespan
 
 from mscore.errors import ErrorResponsesBuilder
+from mscore.lifespan_manager import LifespanManager
 from mscore.logging import setup_logging
 from mscore.middlewares import ErrorHandlingMiddleware, RequestIdMiddleware
 from mscore.monitoring.health import get_health_router
 from mscore.settings import BaseAppSettings
-from mscore.types import AppType
 from mscore.utils import get_project_version
+
+if TYPE_CHECKING:
+    from mscore.types import AppType
 
 
 def create_app(
     settings: BaseAppSettings,
     /,
-    lifespan: Lifespan[AppType] | None = None,
+    lifespans: list[Lifespan[AppType]] | None = None,
     health_checks: list[Callable] | None = None,
 ) -> AppType:
     """Create a FastAPI application.
@@ -44,7 +49,7 @@ def create_app(
         # description=
         # summary=
         version=get_project_version("pyproject.toml"),
-        lifespan=lifespan,
+        lifespan=LifespanManager(lifespans),
         exception_handlers={
             # handle all exceptions inside `ErrorHandlingMiddleware`
             HTTPException: _re_raise_exception,

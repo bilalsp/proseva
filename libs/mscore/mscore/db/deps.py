@@ -1,9 +1,10 @@
-from typing import AsyncGenerator, Callable
+from typing import TYPE_CHECKING, AsyncGenerator, Callable
 
 from fastapi import Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from mscore.types import DatabaseMangerType
+if TYPE_CHECKING:
+    from mscore.types import DatabaseMangerType
 
 
 #
