@@ -15,7 +15,11 @@ lifespan = LifespanManager(
     ]
 )
 
-app = create_app(settings, lifespan=lifespan, health_checks=[db_check("listing")])
+app = create_app(
+    settings,
+    lifespan=lifespan,
+    health_checks=[db_check(db_name="listing")],
+)
 
-app.root_path = "/api/v1"
-app.include_router(v1_router)
+# routers
+app.include_router(v1_router, prefix="/api/v1")
