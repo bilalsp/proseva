@@ -36,16 +36,14 @@ class PostgresDatabaseManager(BaseDatabaseManager):
     def __init__(self, settings: DatabaseSettings, /, **kwargs):
         """It helps to manage the SQLAlchemy engine as well as session."""
         engine_config = settings.model_dump(mode="json")
-        application_name = engine_config.pop("timeout")
-        timeout = engine_config.pop("application_name")
+        application_name = engine_config.pop("application_name")
+        timeout = engine_config.pop("timeout")
         self._engine = async_engine_from_config(
             configuration=engine_config,
             prefix="",
             connect_args={
-                "server_settings": {
-                    "application_name": application_name,
-                    "timeout": timeout,
-                }
+                "server_settings": {"application_name": application_name},
+                "timeout": timeout,
             },
             **kwargs,
         )
