@@ -31,3 +31,8 @@ Sample:
 
 ## revisit docker-compose.yml
 - setup proper configuration for reverse-proxy
+- add vault service to store secrets
+
+## mscore
+- document proper status code return by each endpoint in swagger using responses in FastAPI
+- 

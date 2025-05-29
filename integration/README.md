@@ -21,7 +21,19 @@ It is required to install the dependency (`mscore`) from private repository.
 - Repository access: `bilalsp/proseva`
 - Repository permissions -> Contents -> Access: `Read-only`
 - Generate Token
-- Set the generated token in `/proseva/integration/.env` file
+- Set the generated token in `/proseva/.env` file
+
+
+## 3. Generate certificate
+```sh 
+bash scripts/certificate/gen-self-signed-certs.bash
+```
+
+## 4. DNS
+```sh
+# run below command using administrator privilege
+bash scripts/add_hosts_entries.sh
+```
 
 
 

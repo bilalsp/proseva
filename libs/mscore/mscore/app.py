@@ -7,6 +7,7 @@ from fastapi.exceptions import RequestValidationError
 from starlette.middleware import Middleware
 from starlette.types import Lifespan
 
+from .auth import KeycloakOpenIDLifespan
 from .errors import ErrorHandlingMiddleware, ErrorResponsesBuilder
 from .lifespan_manager import LifespanManager
 from .logging import setup_logging
@@ -44,7 +45,7 @@ def create_app(
         lifespans = []
 
     # include default lifespan
-    # lifespans.append(KeycloakOpenIDLifespan(settings.keycloak))
+    lifespans.append(KeycloakOpenIDLifespan(settings.keycloak))
 
     # create an ASGI application
     app = FastAPI(
