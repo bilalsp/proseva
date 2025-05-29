@@ -20,8 +20,6 @@ services:
       listing-db:
         condition: service_healthy
         # restart: true # TODO: restart is not support in current version. [upgrade docker-engine] 
-    ports:
-      - 6001:80
     # volumes:
     #   - "/var/log/listing-microservice:/var/log/listing-microservice"
     networks:
@@ -61,11 +59,7 @@ services:
   infra-keycloak:
     image: quay.io/keycloak/keycloak:26.2
     container_name: infra-keycloak
-    ports:
-      - 8080:8080
     environment:
-    # - KEYCLOAK_ADMIN=admin
-    # - KEYCLOAK_ADMIN_PASSWORD=proseva@2025
       - KC_BOOTSTRAP_ADMIN_USERNAME=admin
       - KC_BOOTSTRAP_ADMIN_PASSWORD=proseva@2025
       - KC_PROXY=edge
@@ -113,46 +107,3 @@ networks:
   #   image: python:
   #   container_name: iam # Identity and Access Management (IAM)
 
-
-  #
-  # 
-  #
-  # auth:
-  #   image: quay.io/keycloak/keycloak:24.0.1
-  #   ports:
-  #     - 8080:8080
-  #   environment:
-  #     KEYCLOAK_ADMIN: admin
-  #     KEYCLOAK_ADMIN_PASSWORD: admin
-  #   command:
-  #     - start-dev
-  #     - --import-realm
-  #   volumes:
-  #     - keycloak-data:/opt/keycloak/data/
-  #   networks:
-  #     - private-net
-
-    # command: tail -f /dev/null
-
-
-
-  # infra-keycloak:
-  #   image: quay.io/keycloak/keycloak:26.2
-  #   container_name: infra-keycloak
-  #   ports:
-  #     - 8080:8080
-  #   environment:
-  #     - KEYCLOAK_ADMIN=admin
-  #     - KEYCLOAK_ADMIN_PASSWORD=***
-  #     - KC_HOSTNAME=localhost
-  #     - KC_LOG_LEVEL=info
-  #     - KC_PROXY=edge
-  #     - KC_HOSTNAME_STRICT=false
-  #     - KC_HTTP_ENABLED=true
-  #     - KC_HTTPS_ENABLED=false
-  #   command:
-  #     - start-dev
-  #   volumes:
-  #     - keycloak-data:/opt/keycloak/data/
-  #   networks:
-  #     - private-net
