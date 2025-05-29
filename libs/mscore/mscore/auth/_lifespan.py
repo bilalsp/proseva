@@ -1,31 +1,24 @@
 from contextlib import asynccontextmanager
-from typing import Any, AsyncIterator
+from typing import AsyncIterator
 
 from fastapi import FastAPI
 from keycloak import KeycloakOpenID
 
-from mscore.schemas import KeycloakState
+from ..settings import KeycloakSettings
+from ._schemas import KeycloakState
 
 
 class KeycloakOpenIDLifespan:
-    def __init__(
-        self,
-        server_url: str,
-        realm_name: str,
-        client_id: str,
-        client_secret_key: str | None = None,
-        verify: bool | str = True,
-        custom_headers: dict[str, Any] | None = None,
-        proxies: dict[str, Any] | None = None,
-        timeout: int = 60,
-    ) -> None:
-        self.openid_client_params = locals()
-        self.openid_client_params.pop("self")
+    def __init__(self, settings: KeycloakSettings, /) -> None:
+        self.settings = settings.model_dump(
+            exclude={"authorization_url", "token_url"},
+            mode="json",
+        )
 
     @asynccontextmanager
     async def __call__(self, app: FastAPI) -> AsyncIterator[dict[str, KeycloakState]]:
         # TODO: [INFO] use logger, initializing keycloak
-        openid_client = KeycloakOpenID(**self.openid_client_params)
+        openid_client = KeycloakOpenID(**self.settings)
         public_key = (
             "-----BEGIN PUBLIC KEY-----\n"
             f"{openid_client.public_key()}"

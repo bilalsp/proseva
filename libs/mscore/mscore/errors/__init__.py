@@ -6,8 +6,10 @@ from ._exceptions import (
     NotFoundError,
     UnauthorizedError,
 )
+from ._middleware import ErrorHandlingMiddleware
 
 __all__ = [
+    "ErrorHandlingMiddleware",
     "HTTPCustomError",
     "BadRequestError",
     "UnauthorizedError",

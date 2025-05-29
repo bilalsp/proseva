@@ -7,10 +7,10 @@ from fastapi.exceptions import RequestValidationError
 from starlette.middleware import Middleware
 from starlette.types import Lifespan
 
-from mscore.errors import ErrorResponsesBuilder
+from mscore.errors import ErrorHandlingMiddleware, ErrorResponsesBuilder
 from mscore.lifespan_manager import LifespanManager
 from mscore.logging import setup_logging
-from mscore.middlewares import ErrorHandlingMiddleware, RequestIdMiddleware
+from mscore.middlewares import RequestIdMiddleware
 from mscore.monitoring.health import get_health_router
 from mscore.settings import BaseAppSettings
 from mscore.utils import get_project_version
@@ -40,7 +40,11 @@ def create_app(
         """Re-raise an exception to handle it inside `ErrorHandlingMiddleware`."""
         raise exc
 
-    # from fastapi.openapi.models import Server
+    if not isinstance(lifespans, list):
+        lifespans = []
+
+    # include default lifespan
+    # lifespans.append(KeycloakOpenIDLifespan(settings.keycloak))
 
     # create an ASGI application
     app = FastAPI(

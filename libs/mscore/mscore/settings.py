@@ -4,7 +4,6 @@ from pathlib import Path
 from typing import Annotated, Any, Literal, TypeVar, cast
 
 from pydantic import (
-    BaseModel,
     Field,
     HttpUrl,
     computed_field,
@@ -71,7 +70,7 @@ class MicroServiceSettings(BaseSettings):
 #
 # auth
 #
-class Keycloak(BaseModel):
+class KeycloakSettings(BaseSettings):
     server_url: Annotated[HttpUrl, Field(description="Keycloak server url.")]
     realm_name: Annotated[
         str,
@@ -119,6 +118,7 @@ class Keycloak(BaseModel):
 
 class BaseAppSettings(BaseSettings):
     ms: MicroServiceSettings
+    keycloak: KeycloakSettings
 
     model_config = SettingsConfigDict(
         extra="ignore", case_sensitive=False, env_nested_delimiter="__", env_file=".env"
