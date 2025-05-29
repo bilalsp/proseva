@@ -5,8 +5,8 @@ services:
     environment:
       - PYTHONPATH=src:/opt/proseva/libs/mscore # NOTE: set it only if you are developing `mscore`
     volumes:
-      - "../microservices/listing:/opt/proseva/microservices/listing:ro"
-      - "../libs:/opt/proseva/libs:ro" # NOTE: mount it only if you are developing `mscore`
+      - "./microservices/listing:/opt/proseva/microservices/listing:ro"
+      - "./libs:/opt/proseva/libs:ro" # NOTE: mount it only if you are developing `mscore`
     tty: true # allocate a pseudo-TTY (terminal) for this container to get colorful logs
     command: python src/listing
     # command: gunicorn -c gunicorn_config.py listing.app:app

@@ -1,0 +1,6 @@
+.env
+docker-compose.override.yml
+
+# dont commit self-signed certificate and key
+configs/nginx/ssl/proseva.crt
+configs/nginx/ssl/proseva.key

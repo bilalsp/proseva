@@ -6,7 +6,7 @@ services:
   lisiting-microservice:
     image: lisiting-microservice
     build:
-      context: "../microservices/listing"
+      context: "microservices/listing"
       args:
         - GITHUB_USERNAME=${GITHUB_USERNAME}
         - GITHUB_TOKEN=${GITHUB_TOKEN}
@@ -21,7 +21,7 @@ services:
         condition: service_healthy
         # restart: true # TODO: restart is not support in current version. [upgrade docker-engine] 
     ports:
-      - 9000:80
+      - 6001:80
     # volumes:
     #   - "/var/log/listing-microservice:/var/log/listing-microservice"
     networks:
@@ -37,7 +37,7 @@ services:
   #
   listing-db:
     image: postgres:17.4-alpine
-    container_name: db-listing
+    container_name: listing-db
     restart: always
     ports:
       - 5432:5432
@@ -55,7 +55,44 @@ services:
       retries: 5
       start_period: 30s
       timeout: 10s
+  #
+  # prerequisites
+  #
+  # nginx:
+  #   image: nginx:latest
+  #   container_name: nginx-proxy
+  #   ports:
+  #     - "80:80"
+  #   volumes:
+  #     - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+  #   depends_on:
+  #     - lisiting-microservice
 
+
+
+
+
+
+  # infra-keycloak:
+  #   image: quay.io/keycloak/keycloak:26.2
+  #   container_name: infra-keycloak
+  #   ports:
+  #     - 8080:8080
+  #   environment:
+  #     - KEYCLOAK_ADMIN=admin
+  #     - KEYCLOAK_ADMIN_PASSWORD=***
+  #     - KC_HOSTNAME=localhost
+  #     - KC_LOG_LEVEL=info
+  #     - KC_PROXY=edge
+  #     - KC_HOSTNAME_STRICT=false
+  #     - KC_HTTP_ENABLED=true
+  #     - KC_HTTPS_ENABLED=false
+  #   command:
+  #     - start-dev
+  #   volumes:
+  #     - keycloak-data:/opt/keycloak/data/
+  #   networks:
+  #     - private-net
 volumes:
   #
   # database volumes
@@ -63,7 +100,7 @@ volumes:
   db-listing-vol:
     driver: local
   keycloak-data:
-
+    driver: local
 networks:
   private-net:
     name: proseva-private-net
