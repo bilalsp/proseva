@@ -8,12 +8,12 @@ from loguru import logger
 from pydantic import ValidationError
 from starlette.types import ASGIApp, Receive, Scope, Send
 
-from mscore.errors._error_responses import (
+from ..settings import MicroServiceSettings
+from ._error_responses import (
     ErrorModelBuilder,
     convert_status_code_to_text,
 )
-from mscore.errors._exceptions import HTTPCustomError
-from mscore.settings import MicroServiceSettings
+from ._exceptions import HTTPCustomError
 
 ErrorMediaType = "application/problem+json"
 

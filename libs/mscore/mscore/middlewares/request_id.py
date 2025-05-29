@@ -1,7 +1,7 @@
 from starlette.datastructures import MutableHeaders
 from starlette.types import ASGIApp, Receive, Scope, Send
 
-from mscore.contexts import new_request_id
+from ..contexts import new_request_id
 
 
 class RequestIdMiddleware:

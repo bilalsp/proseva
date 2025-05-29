@@ -4,8 +4,8 @@ import sys
 
 from loguru import logger
 
-from mscore.contexts import get_request_id
-from mscore.settings import MicroServiceSettings
+from .contexts import get_request_id
+from .settings import MicroServiceSettings
 
 LOGURU_FORMAT = (
     "<g>{time:YYYY-MM-DD HH:mm:ss.SSS}</g>"

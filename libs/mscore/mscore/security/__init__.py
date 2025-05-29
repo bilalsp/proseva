@@ -1,8 +1,8 @@
-from mscore.security.oauth2 import (
+from .oauth2 import (
     OAuth2ClientCredentials,
     OAuth2ClientCredentialsRequestForm,
 )
-from mscore.security.rlac import RowLevelAccessControl
+from .rlac import RowLevelAccessControl
 
 __all__ = [
     "RowLevelAccessControl",

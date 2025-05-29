@@ -4,7 +4,7 @@ from typing import Any, Literal, Mapping
 from fastapi import status
 from pydantic import BaseModel, Field, create_model
 
-from mscore.settings import Environment, MicroServiceSettings
+from ..settings import Environment, MicroServiceSettings
 
 # fields name of dynamic error-model
 TYPE = "type"

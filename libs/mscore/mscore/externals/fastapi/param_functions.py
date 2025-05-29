@@ -1,6 +1,6 @@
 from typing import Any, Callable, Optional, Sequence
 
-from mscore.externals.fastapi import params
+from . import params
 
 
 def SecurityAcl(

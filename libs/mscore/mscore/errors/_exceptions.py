@@ -3,7 +3,7 @@ from typing import Any, Mapping
 
 from fastapi import status
 
-from mscore.errors._error_responses import convert_status_code_to_text
+from ._error_responses import convert_status_code_to_text
 
 
 class HTTPCustomError(Exception):

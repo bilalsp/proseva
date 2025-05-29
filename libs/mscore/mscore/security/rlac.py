@@ -8,9 +8,9 @@ from typing import Any, Callable, Literal
 from fastapi import Depends, HTTPException, status
 from pydantic import BaseModel
 
-from mscore.externals.fastapi import SecurityAcl, params
-from mscore.schemas import CurrentUser
-from mscore.security._errors import MSCoreUserError
+from ..externals.fastapi import SecurityAcl, params
+from ..schemas import CurrentUser
+from ._errors import MSCoreUserError
 
 
 class Action(Enum):

@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
 )
 
-from mscore.db.settings import DatabaseSettings
+from ..db.settings import DatabaseSettings
 
 
 #

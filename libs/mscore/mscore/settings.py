@@ -10,8 +10,8 @@ from pydantic import (
 )
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from mscore.db import DatabaseSettings
-from mscore.security._errors import MSCoreUserError
+from .db import DatabaseSettings
+from .security._errors import MSCoreUserError
 
 TSettings = TypeVar("TSettings", bound=BaseSettings)
 

@@ -7,16 +7,16 @@ from fastapi.exceptions import RequestValidationError
 from starlette.middleware import Middleware
 from starlette.types import Lifespan
 
-from mscore.errors import ErrorHandlingMiddleware, ErrorResponsesBuilder
-from mscore.lifespan_manager import LifespanManager
-from mscore.logging import setup_logging
-from mscore.middlewares import RequestIdMiddleware
-from mscore.monitoring.health import get_health_router
-from mscore.settings import BaseAppSettings
-from mscore.utils import get_project_version
+from .errors import ErrorHandlingMiddleware, ErrorResponsesBuilder
+from .lifespan_manager import LifespanManager
+from .logging import setup_logging
+from .middlewares import RequestIdMiddleware
+from .monitoring.health import get_health_router
+from .settings import BaseAppSettings
+from .utils import get_project_version
 
 if TYPE_CHECKING:
-    from mscore.types import AppType
+    from .types import AppType
 
 
 def create_app(
@@ -87,22 +87,3 @@ def create_app(
     setup_logging(settings=settings.ms)
 
     return app
-
-
-# from mscore.errors._middlewares import LifespanLoggerMiddleware
-
-# app.add_middleware(LifespanLoggerMiddleware)
-
-# from mscore.errors._middlewares import ErrorHandlingMiddleware2
-
-# app.add_middleware(ErrorHandlingMiddleware2)
-# from mscore.lifespan import KeycloakOpenIDLifespan, LifespanManager
-# lifespan_manager = LifespanManager(
-#     [
-#         KeycloakOpenIDLifespan(
-#             **settings.keycloak.model_dump(
-#                 exclude={"authorization_url", "token_url"}, mode="json"
-#             )
-#         ),
-#     ]
-# )

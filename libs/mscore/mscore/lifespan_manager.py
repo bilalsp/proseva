@@ -7,7 +7,7 @@ from fastapi import FastAPI
 from starlette.types import Lifespan
 
 if TYPE_CHECKING:
-    from mscore.types import AppStateType, AppType
+    from .types import AppStateType, AppType
 
 
 class LifespanManager:

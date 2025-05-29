@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 from typing import TYPE_CHECKING, AsyncGenerator
 
 if TYPE_CHECKING:
-    from mscore.types import AppType, DatabaseMangerType
+    from ..types import AppType, DatabaseMangerType
 
 
 class DatabaseLifespan:

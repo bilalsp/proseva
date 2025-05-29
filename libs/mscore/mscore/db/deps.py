@@ -4,7 +4,7 @@ from fastapi import Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 if TYPE_CHECKING:
-    from mscore.types import DatabaseMangerType
+    from ..types import DatabaseMangerType
 
 
 #
