@@ -1,11 +1,15 @@
 #!/bin/bash
-# -----------------------------------------------------------------------------
-# Generates a self-signed SSL certificate for the ProSeva system.
+
+# -----------------------------------------------------------------------------------------------------
+# Description: 
+#   Generates a self-signed SSL certificate for the ProSeva system.
 #
-# Reference: https://stackoverflow.com/questions/10175812/how-can-i-generate-a-self-signed-ssl-certificate-using-openssl
+# Reference: 
+#   https://stackoverflow.com/questions/10175812/how-can-i-generate-a-self-signed-ssl-certificate-using-openssl
+#
 # Usage:
 #   bash scripts/certificate/gen-self-signed-certs.bash
-# -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------------------------------
 
 SSL_DIR="configs/nginx/ssl"
 KEY_FILE="$SSL_DIR/proseva.key"

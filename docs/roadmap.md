@@ -28,3 +28,6 @@ Sample:
       - ./rsyslog/rsyslog.conf:/etc/rsyslog.conf
       - rsyslog_data:/var/log      
 ```
+
+## revisit docker-compose.yml
+- setup proper configuration for reverse-proxy

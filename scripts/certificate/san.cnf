@@ -6,10 +6,11 @@ req_extensions     = req_ext
 distinguished_name = dn
 
 [dn]
-CN = service1.local
+CN = localhost
 
 [req_ext]
 subjectAltName = @alt_names
 
 [alt_names]
+DNS.1 = api-listing
 DNS.1 = api-listing
