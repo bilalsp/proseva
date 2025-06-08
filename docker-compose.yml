@@ -17,19 +17,18 @@ services:
     hostname: mbansari.proseva.in
     container_name: listing-microservice
     depends_on:
+      infra-keycloak:
+        condition: service_healthy
       listing-db:
         condition: service_healthy
         # restart: true # TODO: restart is not support in current version. [upgrade docker-engine] 
     # volumes:
-    #   - "/var/log/listing-microservice:/var/log/listing-microservice"
+    #   - ./configs/nginx/ssl/proseva.crt:/usr/local/share/ca-certificates/proseva.crt:ro
+    # extra_hosts:
+    #   - "keycloak.proseva.net:host-gateway"
     networks:
       - private-net
     # healthcheck: # TODO: define health-check route..
-    #   test: ["executable", "arg"]
-    #   interval: 1m30s
-    #   timeout: 30s
-    #   retries: 5
-    #   start_period: 30s
   #
   # databases
   #
@@ -63,6 +62,7 @@ services:
       - KC_BOOTSTRAP_ADMIN_USERNAME=admin
       - KC_BOOTSTRAP_ADMIN_PASSWORD=proseva@2025
       - KC_PROXY=edge
+      - KC_HEALTH_ENABLED=true
     command:
       - start-dev
       - --hostname=https://keycloak.proseva.net
@@ -70,9 +70,13 @@ services:
     volumes:
       - keycloak-data:/opt/keycloak/data/
     networks:
-      private-net:
-        aliases:
-          - keycloak.proseva.net
+      - private-net
+    healthcheck:
+      test: ['CMD-SHELL', '[ -f /tmp/HealthCheck.java ] || echo "public class HealthCheck { public static void main(String[] args) throws java.lang.Throwable { System.exit(java.net.HttpURLConnection.HTTP_OK == ((java.net.HttpURLConnection)new java.net.URL(args[0]).openConnection()).getResponseCode() ? 0 : 1); } }" > /tmp/HealthCheck.java && java /tmp/HealthCheck.java http://localhost:9000/health/live']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
   infra-reverse-proxy:
     image: nginx:1.14.2
     container_name: infra-reverse-proxy
@@ -102,10 +106,3 @@ networks:
     ipam:
       config:
         - subnet: ${PROSEVA_PRIVATE_NET}
-
-
-
-  # iam-service:
-  #   image: python:
-  #   container_name: iam # Identity and Access Management (IAM)
-

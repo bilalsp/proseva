@@ -24,7 +24,8 @@ openssl req -x509 -nodes -days 365 \
   -newkey rsa:2048 \
   -keyout "$KEY_FILE" \
   -out "$CRT_FILE" \
-  -config "$CONF_FILE"
+  -config "$CONF_FILE" \
+  -extensions req_ext
 
 echo "Self-signed certificate and key generated:"
 echo "  Certificate: $CRT_FILE"
