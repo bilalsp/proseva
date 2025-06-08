@@ -1,7 +1,5 @@
 from fastapi import HTTPException, status
 
-MSCoreUserError = Exception  # MSCoreUserError similar to PydanticUserError
-
 ForbiddenError = Exception
 
 AuthenticationRequiredError = HTTPException(

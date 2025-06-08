@@ -10,7 +10,7 @@ from pydantic import BaseModel
 
 from ..exceptions import MSCoreUserError
 from ..externals.fastapi import SecurityAcl, params
-from ..schemas import CurrentUser
+from ._schemas import CurrentUser
 
 
 class Action(Enum):

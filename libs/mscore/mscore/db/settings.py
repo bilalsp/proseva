@@ -3,7 +3,7 @@ from typing import Annotated
 from pydantic import Field, PostgresDsn, field_validator
 from pydantic_settings import BaseSettings
 
-from ..security._errors import MSCoreUserError
+from ..exceptions import MSCoreUserError
 
 
 class DatabaseSettings(BaseSettings):

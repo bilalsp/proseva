@@ -45,3 +45,8 @@ def db_check(db_name: str) -> Callable:
         f"Performs a health check on {db_name} database by executing a simple query."
     )
     return depends
+
+
+# TODO:
+def keycloak_check():
+    ...
