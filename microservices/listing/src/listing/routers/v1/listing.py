@@ -4,6 +4,7 @@ from fastapi import APIRouter, Query, Depends, Body, Request, status
 from pydantic import BaseModel, Field
 
 from mscore.utils import get_openapi_examples
+from mscore.auth import get_token
 
 from listing.dto.requests import ListingCreateReqDTO
 from listing.dto.responses import ListingCreateResDTO
@@ -23,18 +24,10 @@ async def create_listing(
         ),
     ],
     service: Annotated[ListingService, Depends()],
+    token: str = Depends(get_token),
 ) -> ListingCreateResDTO:
     """Create a new listing."""
-    # raise Exception("base erro testing..")
-    # print("creating...")
-
-    # from mscore.errors import HTTPCustomError
-    # raise HTTPCustomError(status_code=500)
-
-    # 34/0
-    res = await service.create_listing(dto=dto)
-    print("created..")
-    return res
+    return await service.create_listing(dto=dto)
 
 
 class Message(BaseModel):
@@ -63,28 +56,6 @@ async def get_listing(
     req: Request, id: Annotated[int, Query(description="Listing's Id.")]
 ):
     """Get listing details."""
-    from mscore.errors import NotFoundError
-
-    raise NotFoundError(detail=f"Listing not found #{id}")
-
-    import http
-    from fastapi import status, HTTPException
-    # return str(req.url.scheme)
-
-    detail = http.HTTPStatus(status.HTTP_404_NOT_FOUND).phrase.title()
-    return detail
-    # from pydantic import Field, create_model
-    # fields = {
-    #         "test": Annotated[
-    #             str,
-    #             Field(23),
-    #         ]
-    #     }
-    # m = create_model('TEST', **fields)
-    # print(m)
-
-    return {"a": 333}
-    raise HTTPException(status_code=404, detail="delte.")
 
 
 @listing_router.patch("")
