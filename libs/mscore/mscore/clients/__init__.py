@@ -9,8 +9,8 @@
 
 
 #
-# https://chatgpt.com/c/68149a99-2360-800b-b96c-1819db353fc2
-#
+# [C] 68149a99-2360-800b-b96c-1819db353fc2
+# # How to reauthenticate httpx.AsyncClient if token get expired 
 
 # import httpx
 # from httpx import Request
