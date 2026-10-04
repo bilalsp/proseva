@@ -7,16 +7,17 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.11"
-fastapi = "^0.115.12"
-SQLAlchemy = {version = "^2.0.40", extras = ["asyncpg"]}
+fastapi = "^0.142.2"
+SQLAlchemy = { version = "^2.0.40", extras = ["asyncpg"] }
 asyncpg = "0.30.0"
 python-keycloak = "^3.9.1"
-pydantic_settings = "^2.2.1"
+pydantic_settings = "^2.15.0"
 toml = "^0.10.2"
 types-toml = "^0.10"
 loguru = "^0.7.3"
 uvicorn = "^0.27.1"
 gunicorn = "^23.0.0"
+PyJWT = { version = "^2.15.1", extras = ["crypto"] }
 #
 # used by main.py
 #
