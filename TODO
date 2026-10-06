@@ -1,0 +1,12 @@
+- [x] Push clean authentication code
+- [] Proper exeception handling for mscore/auth
+- [] Proper application logging for mscore/auth
+- [] Verify public key rotation of keycloak in jwks.py
+- [] Work on mscore/auth/authorization
+- [] Clean up keycloak infra
+    - use https://sso.proseva.net instead of https://keycloak.proseva.net
+    - maybe put keycloak in a seperate network outside other microservices, maybe should not be behind the reverse-proxy
+    - all services should communicate to keycloak over canonical url and HTTPS (https://sso.proseva.net) without hitting reverse-proxy
+    - clean up docker-compose.yml 
+- [] How get_settings will work in mscore and microservice with respect to lru_cache
+- [] support for "free hosted Keycloak option: Cloud-IAM Freemium" and "supabase" in mscore/auth
