@@ -3,10 +3,11 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Annotated, Any, Literal, TypeVar, cast
 
-from pydantic import Field
+from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from .auth import KeycloakSettings
+from mscore.auth.providers.keycloak.settings import KeycloakSettings
+from mscore.auth.providers.auth0.settings import Auth0Settings
 from .db import DatabaseSettings
 from .exceptions import MSCoreUserError
 
@@ -25,7 +26,7 @@ class Environment(str, Enum):
     PRODUCTION = "production"
 
 
-class MicroServiceSettings(BaseSettings):
+class MicroServiceSettings(BaseModel):
     name: Annotated[str, Field(description="Microservice's name.")]
     port: Annotated[
         int,
@@ -64,14 +65,22 @@ class MicroServiceSettings(BaseSettings):
     ] = False
 
 
-#
-# db
-#
+class SwaggerSettings(BaseModel):
+    client_id: str
+    use_pkce_with_authorization_code_grant: bool = True
+    display_request_duration: bool = True
+    filter: bool = True
+    operations_sorter: str | None = "alpha"
+    persist_authorization: bool = True
 
 
 class BaseAppSettings(BaseSettings):
     ms: MicroServiceSettings
-    keycloak: KeycloakSettings
+    auth_provider: Annotated[
+        KeycloakSettings | Auth0Settings,
+        Field(discriminator="provider"),
+    ]
+    swagger: SwaggerSettings
 
     model_config = SettingsConfigDict(
         extra="ignore", case_sensitive=False, env_nested_delimiter="__", env_file=".env"

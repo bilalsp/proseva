@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 from contextlib import AsyncExitStack, asynccontextmanager
-from typing import TYPE_CHECKING, Any, AsyncIterator, Self
+from collections.abc import AsyncGenerator
+from typing import TYPE_CHECKING, Any, Self
 
 from fastapi import FastAPI
 from starlette.types import Lifespan
@@ -15,7 +16,7 @@ class LifespanManager:
         self.lifespans = lifespans or []
 
     @asynccontextmanager
-    async def __call__(self, app: FastAPI) -> AsyncIterator[AppStateType]:
+    async def __call__(self, app: FastAPI) -> AsyncGenerator[AppStateType]:
         state: dict[str, Any] = {}
         async with AsyncExitStack() as exit_stack:
             for lifespan in self.lifespans:

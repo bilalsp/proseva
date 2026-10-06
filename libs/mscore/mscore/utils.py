@@ -51,12 +51,7 @@ def get_openapi_examples(examples_file: str, /) -> dict:
     return json.load(open(examples_file_path, encoding="utf-8"))
 
 
-@lru_cache
-def get_openid_config(keycloak_server_url: str, realm_name: str) -> dict:
-    url = f"{keycloak_server_url}/realms/{realm_name}/.well-known/openid-configuration"
-    response = requests.get(url)  # TOOD: use httpx library
-    response.raise_for_status()
-    return response.json()
+
 
 
 # #

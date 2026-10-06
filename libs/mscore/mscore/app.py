@@ -7,7 +7,7 @@ from fastapi.exceptions import RequestValidationError
 from starlette.middleware import Middleware
 from starlette.types import Lifespan
 
-from .auth import KeycloakOpenIDLifespan
+from mscore.auth.providers.factory import get_auth_provider_lifespan
 from .errors import ErrorHandlingMiddleware, ErrorResponsesBuilder
 from .lifespan_manager import LifespanManager
 from .logging import setup_logging
@@ -44,8 +44,10 @@ def create_app(
     if not isinstance(lifespans, list):
         lifespans = []
 
-    # include default lifespan
-    lifespans.append(KeycloakOpenIDLifespan(settings.keycloak))
+    # include default lifespans
+    lifespans.extend([
+        get_auth_provider_lifespan(settings.auth_provider, audience=settings.ms.name),
+    ])
 
     # create an ASGI application
     app = FastAPI(
@@ -76,8 +78,16 @@ def create_app(
             ],
         ),
         swagger_ui_init_oauth={
-            # "clientId": f"{settings.keycloak.client_id}-swagger-ui",
-            "usePkceWithAuthorizationCodeGrant": True,
+            "clientId": settings.swagger.client_id,
+            "usePkceWithAuthorizationCodeGrant": (
+                settings.swagger.use_pkce_with_authorization_code_grant
+            ),
+        },
+        swagger_ui_parameters={
+            "displayRequestDuration": settings.swagger.display_request_duration,
+            "filter": settings.swagger.filter,
+            "operationsSorter": settings.swagger.operations_sorter,
+            "persistAuthorization": settings.swagger.persist_authorization,
         },
     )
 

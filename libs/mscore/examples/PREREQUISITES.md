@@ -4,6 +4,37 @@ NOTE: You can also import realm instead of following all the below steps.
 Realm file: /examples/data/realm-export-mscore.json
 
 
+Realm proseva:
+    Create the client:
+        Client ID: listing-microservice
+
+    Create the client:
+        Client ID: listing-swagger-ui
+        Client authentication: Off
+        Authorization: Off
+        Standard flow: On
+        Direct access grants: Off
+        Valid redirect URIs: https://api-listing.proseva.net/docs/oauth2-redirect
+        Web origins: https://api-listing.proseva.net
+        Under Advanced Tab:
+            Proof Key for Code Exchange Code Challenge Method: S256
+        Add audience for this client:
+            Clients → listing-swagger-ui → Client scopes → Dedicated scopes `listing-swagger-ui-dedicated`
+            Add a mapper
+                Mapper type: Audience
+                Name: listing-microservice-audience
+                Included Client Audience: listing-microservice
+                Add to access token: ON
+                Add to ID token: OFF
+
+    Create the user
+        Username: listing-swagger
+        Email: listing-swagger@example.com
+        First Name: listing-swagger
+        Last Name: listing-swagger
+
+
+
 - Create a Realm `mscore`
 
 - Create a client `api-test`

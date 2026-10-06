@@ -1,12 +1,11 @@
 from typing import Annotated
 
-from pydantic import Field, PostgresDsn, field_validator
-from pydantic_settings import BaseSettings
+from pydantic import BaseModel, Field, PostgresDsn, field_validator
 
 from ..exceptions import MSCoreUserError
 
 
-class DatabaseSettings(BaseSettings):
+class DatabaseSettings(BaseModel):
     url: PostgresDsn
     pool_size: Annotated[
         int,
