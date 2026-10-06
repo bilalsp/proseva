@@ -4,13 +4,21 @@ from fastapi import APIRouter, Query, Depends, Body, Request, status
 from pydantic import BaseModel, Field
 
 from mscore.utils import get_openapi_examples
-from mscore.auth import get_token
+from mscore.auth import get_raw_access_token, get_access_token, AccessToken
 
 from listing.dto.requests import ListingCreateReqDTO
 from listing.dto.responses import ListingCreateResDTO
 from listing.services import ListingService
 
 listing_router = APIRouter()
+
+
+@listing_router.get("/me")
+async def me(
+    row_token: Annotated[str, Depends(get_raw_access_token)],
+    token: Annotated[AccessToken, Depends(get_access_token)],
+) -> dict:
+    return {"row_token": row_token, "token": token}
 
 
 @listing_router.post("", status_code=status.HTTP_201_CREATED)
@@ -24,9 +32,10 @@ async def create_listing(
         ),
     ],
     service: Annotated[ListingService, Depends()],
-    token: str = Depends(get_token),
+    token: str = Depends(get_access_token),
 ) -> ListingCreateResDTO:
     """Create a new listing."""
+    print("token: ", token)
     return await service.create_listing(dto=dto)
 
 

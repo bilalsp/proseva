@@ -8,10 +8,10 @@ package-mode = true
 
 [tool.poetry.dependencies]
 python = "^3.11"
-fastapi = "^0.115.12"
-pydantic = "^2.10.6"
+fastapi = "^0.142.2"
+pydantic = "^2.13.5"
 alembic = "^1.15.2"
-mscore = { git = "https://github.com/bilalsp/proseva.git", subdirectory = "libs/mscore", rev="915e143" } # TODO: use either tag or rev
+mscore = { git = "https://github.com/bilalsp/proseva.git", subdirectory = "libs/mscore", rev="4a98783" } # TODO: use either tag or rev
 # mscore = {git = "git@github.com:bilalsp/proseva.git", subdirectory = "libs/mscore"}
 # mscore = {path = "../../libs/mscore", develop = true}
 uvicorn = "^0.27.1"
