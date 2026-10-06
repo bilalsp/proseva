@@ -1,14 +1,16 @@
-from typing import Annotated
+from typing import Annotated, Literal
 
 from pydantic import (
+    BaseModel,
     Field,
     HttpUrl,
     computed_field,
 )
-from pydantic_settings import BaseSettings
 
 
-class KeycloakSettings(BaseSettings):
+class KeycloakSettings(BaseModel):
+    provider: Literal["keycloak"] = "keycloak"
+
     server_url: Annotated[HttpUrl, Field(description="Keycloak server url.")]
     realm_name: Annotated[
         str,
@@ -26,24 +28,29 @@ class KeycloakSettings(BaseSettings):
         ),
     ]
     client_secret_key: Annotated[
-        str,
+        str | None,
         Field(
+            None,
             description="""The secret which allows the client to prove its identity to the
             Keycloak server. NOTE: It should be known only to the application and the
-            authorization server"""
+            authorization server. A public Keycloak client doesn't need it.""",
         ),
     ]
 
     @computed_field
-    def authorization_url(self) -> str:
-        """Client application redirects users to this url in order to authenticate them."""
-        return (
-            f"{self.server_url}/realms/{self.realm_name}/protocol/openid-connect/auth"
-        )
+    @property
+    def issuer(self) -> str:
+        """The issuer URL identifying the Keycloak realm that issued the token."""
+        return f"{str(self.server_url).rstrip('/')}/realms/{self.realm_name}"
 
     @computed_field
+    @property
+    def authorization_url(self) -> str:
+        """Client application redirects users to this url in order to authenticate them."""
+        return f"{str(self.server_url).rstrip('/')}/realms/{self.realm_name}/protocol/openid-connect/auth"
+
+    @computed_field
+    @property
     def token_url(self) -> str:
         """It is used to fetch a token from the keycloak."""
-        return (
-            f"{self.server_url}/realms/{self.realm_name}/protocol/openid-connect/token"
-        )
+        return f"{str(self.server_url).rstrip('/')}/realms/{self.realm_name}/protocol/openid-connect/token"

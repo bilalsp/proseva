@@ -1,9 +1,11 @@
-from ._dependencies import get_token
-from ._lifespan import KeycloakOpenIDLifespan
-from ._settings import KeycloakSettings
+from mscore.auth.authentication.dependencies import (
+    get_access_token,
+    get_raw_access_token,
+)
+from mscore.auth.models import AccessToken
 
 __all__ = [
-    "KeycloakSettings",
-    "KeycloakOpenIDLifespan",
-    "get_token",
+    "get_access_token",
+    "get_raw_access_token",
+    "AccessToken",
 ]
