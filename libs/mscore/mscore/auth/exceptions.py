@@ -4,3 +4,7 @@ class TokenValidationError(Exception):
 
 class UnauthorizedError(Exception):
     ...
+
+
+class ForbiddenError(Exception):
+    """Raised when an authenticated principal lacks permission."""

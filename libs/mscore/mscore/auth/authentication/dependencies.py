@@ -4,7 +4,7 @@ from fastapi import Depends, Request
 
 from mscore.auth.authentication.schemes import get_oauth2_scheme
 from mscore.auth.exceptions import TokenValidationError, UnauthorizedError
-from mscore.auth.models import AccessToken
+from mscore.auth.models import AccessToken, Principal
 from mscore.auth.providers.protocols import TokenValidator
 from mscore.auth.providers.state import AuthProviderState
 
@@ -41,3 +41,22 @@ async def get_access_token(
         return await validator.validate(token)
     except TokenValidationError as exc:
         raise UnauthorizedError("Invalid authentication token.") from exc
+
+
+def get_principal(
+    token: Annotated[
+        AccessToken,
+        Depends(get_access_token),
+    ],
+) -> Principal:
+    """Build the provider-independent authorization principal."""
+
+    def parse_scopes(value: str | None) -> frozenset[str]:
+        if value is None:
+            return frozenset()
+        return frozenset(value.split())
+
+    return Principal(
+        sub=token.sub,
+        scopes=parse_scopes(token.claims.get("scope")),
+    )

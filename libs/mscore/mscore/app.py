@@ -82,6 +82,7 @@ def create_app(
             "usePkceWithAuthorizationCodeGrant": (
                 settings.swagger.use_pkce_with_authorization_code_grant
             ),
+            "scopes": " ".join(settings.swagger.oauth2_scopes),
         },
         swagger_ui_parameters={
             "displayRequestDuration": settings.swagger.display_request_duration,

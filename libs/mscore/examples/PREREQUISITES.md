@@ -1,10 +1,35 @@
 # KEYCLOAK
 
-NOTE: You can also import realm instead of following all the below steps. 
-Realm file: /examples/data/realm-export-mscore.json
-
 
 Realm proseva:
+    Create the user
+        Username: listing-swagger
+        Email: listing-swagger@example.com
+        First Name: listing-swagger
+        Last Name: listing-swagger
+
+    Create realm roles
+        - admin
+        - moderator
+        - member
+
+    Create groups
+        - proseva-admins
+            Add member: listing-swagger
+            Role mapping: assing admin role
+        - proseva-moderators
+        - proseva-members
+    
+    Create Client Scopes
+        - listing:read
+            Include in token scope: ON, Scope: Assign roles (admin, moderator, memeber)
+        - listing:create
+            Include in token scope: ON, Scope: Assign roles (admin, moderator, memeber)
+        - listing:update
+            Include in token scope: ON, Scope: Assign roles (admin, moderator, memeber)
+        - listing:moderate
+            Include in token scope: ON, Scope: Assign roles (admin, moderator)
+
     Create the client:
         Client ID: listing-microservice
 
@@ -26,14 +51,17 @@ Realm proseva:
                 Included Client Audience: listing-microservice
                 Add to access token: ON
                 Add to ID token: OFF
-
-    Create the user
-        Username: listing-swagger
-        Email: listing-swagger@example.com
-        First Name: listing-swagger
-        Last Name: listing-swagger
+        Add client scopes:
+            Clients → listing-swagger-ui → Client scopes → Add client scope
+                listing:read, listing:create, listing:update (Assigned Type: Default) 
+                listing:moderate (Assigned Type: Optional)
 
 
+===============================================================================
+
+
+NOTE: You can also import realm instead of following all the below steps. 
+Realm file: /examples/data/realm-export-mscore.json
 
 - Create a Realm `mscore`
 

@@ -72,6 +72,7 @@ class SwaggerSettings(BaseModel):
     filter: bool = True
     operations_sorter: str | None = "alpha"
     persist_authorization: bool = True
+    oauth2_scopes: dict[str, str] = Field(default_factory=dict)
 
 
 class BaseAppSettings(BaseSettings):

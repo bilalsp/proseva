@@ -35,3 +35,17 @@ class AccessToken(BaseModel, frozen=True):
         ...,
         description="Additional claims contained in the token that are not represented by the standard fields above.",
     )
+
+
+class Principal(BaseModel, frozen=True):
+    """Provider-independent identity used by authorization."""
+
+    sub: str = Field(
+        ...,
+        min_length=1,
+        description="A unique identifier for the subject (typically the user) to whom the token was issued.",
+    )
+    scopes: frozenset[str] = Field(
+        default_factory=frozenset,
+        description="Normalized OAuth scopes granted to the principal.",
+    )

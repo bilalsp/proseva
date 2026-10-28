@@ -15,5 +15,6 @@ def get_oauth2_scheme() -> OAuth2AuthorizationCodeBearer:
     return OAuth2AuthorizationCodeBearer(
         authorizationUrl=settings.auth_provider.authorization_url,
         tokenUrl=settings.auth_provider.token_url,
+        scopes=settings.swagger.oauth2_scopes,
         auto_error=False,  # handle error manually
     )
