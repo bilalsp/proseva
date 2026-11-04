@@ -4,7 +4,7 @@ from mscore.auth.authentication.dependencies import (
     get_principal,
 )
 from mscore.auth.authorization.scope.dependencies import require_scopes
-from mscore.auth.models import AccessToken
+from mscore.auth.models import AccessToken, Principal
 
 __all__ = [
     "get_access_token",
@@ -12,4 +12,5 @@ __all__ = [
     "get_principal",
     "require_scopes",
     "AccessToken",
+    "Principal",
 ]

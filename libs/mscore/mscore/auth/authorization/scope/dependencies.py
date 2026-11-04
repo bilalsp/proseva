@@ -21,6 +21,14 @@ def require_scopes(
     missing = required - principal.scopes
 
     if missing:
-        raise ForbiddenError("Insufficient permissions.")
+        raise ForbiddenError(
+            "Insufficient permissions to access this endpoint.",
+            error_log={
+                "event": "authorization_failed",
+                "reason": "insufficient_scopes",
+                "required_scopes": sorted(required),
+                "missing_scopes": sorted(missing),
+            },
+        )
 
     return principal

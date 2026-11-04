@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import Depends, Request
 
 from mscore.auth.authentication.schemes import get_oauth2_scheme
-from mscore.auth.exceptions import TokenValidationError, UnauthorizedError
+from mscore.auth.exceptions import UnauthorizedError
 from mscore.auth.models import AccessToken, Principal
 from mscore.auth.providers.protocols import TokenValidator
 from mscore.auth.providers.state import AuthProviderState
@@ -37,10 +37,7 @@ async def get_access_token(
     ],
 ) -> AccessToken:
     """Validate the current access token and return its normalized model."""
-    try:
-        return await validator.validate(token)
-    except TokenValidationError as exc:
-        raise UnauthorizedError("Invalid authentication token.") from exc
+    return await validator.validate(token)
 
 
 def get_principal(
