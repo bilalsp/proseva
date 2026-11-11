@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 import html
@@ -15,22 +14,37 @@ from starlette.staticfiles import StaticFiles
 from mscore.settings import BaseAppSettings, get_settings
 
 
-app_settings: BaseAppSettings = get_settings()
-microservice_name = app_settings.ms.name
+
+# ---------------------------------------------------------------------------
+# Configuration
+# ---------------------------------------------------------------------------
+
+_SETTINGS: BaseAppSettings = get_settings()
+_MICROSERVICE_NAME = _SETTINGS.ms.name
 
 _STATIC_DIR = Path(__file__).resolve().parent / "static" / "swagger"
 
-_SWAGGER_UI_VERSION = "5.17.14"
+_SWAGGER_UI_VERSION = "5"
 
-_ASSETS_MOUNT = f"/_{microservice_name}/swagger"
-_ASSETS_MOUNT_NAME = f"{microservice_name}-swagger-assets"
+_ASSETS_MOUNT = f"/_{_MICROSERVICE_NAME}/swagger"
+_ASSETS_MOUNT_NAME = f"{_MICROSERVICE_NAME}-swagger-assets"
 
-_DOCS_ROUTE_NAME = f"{microservice_name}-swagger-docs"
-_REDIRECT_ROUTE_NAME = f"{microservice_name}-swagger-oauth2-redirect"
+_DOCS_ROUTE_NAME = f"{_MICROSERVICE_NAME}-swagger-docs"
+_REDIRECT_ROUTE_NAME = f"{_MICROSERVICE_NAME}-swagger-oauth2-redirect"
 
+_REQUIRED_ASSETS = (
+    "swagger-initializer.js",
+    "oauth2-scopes.js",
+    "oauth2-scopes.css",
+)
+
+
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
 
 def _safe_json(value: Any) -> str:
-    """Serialize JSON safely for embedding in HTML."""
+    """Serialize JSON safely for embedding inside an HTML document."""
     return (
         json.dumps(value)
         .replace("<", "\\u003c")
@@ -44,102 +58,98 @@ def _route_path(
     route_name: str,
     **path_params: Any,
 ) -> str:
-    """Resolve a named route without retaining its scheme or authority."""
+    """Resolve a named route into a relative URL path."""
     url = request.url_for(route_name, **path_params)
-    parsed = urlsplit(str(url))
+    parsed_url = urlsplit(str(url))
 
-    return parsed.path + (f"?{parsed.query}" if parsed.query else "")
+    path = parsed_url.path
+
+    if parsed_url.query:
+        path = f"{path}?{parsed_url.query}"
+
+    return path
 
 
-def install_swagger_ui(
-    app: FastAPI,
-    *,
-    docs_url: str = "/docs",
-    oauth2_redirect_url: str = "/docs/oauth2-redirect",
-    swagger_ui_parameters: dict[str, Any] | None = None,
-    init_oauth: dict[str, Any] | None = None,
-) -> None:
-    """Install custom Swagger UI with OAuth2 scopes support.
-
-    Browser-side URL resolution avoids depending on forwarded headers
-    for HTTPS termination at reverse proxies.
-    """
-
-    if app.openapi_url is None:
-        raise RuntimeError("FastAPI openapi_url must be enabled.")
-
+def _validate_static_assets() -> None:
+    """Ensure the Swagger static directory and required files exist."""
     if not _STATIC_DIR.is_dir():
         raise RuntimeError(
             f"Swagger static directory does not exist: {_STATIC_DIR}"
         )
 
-    required_files = (
-        "swagger-initializer.js",
-        "oauth2-scopes.js",
-        "oauth2-scopes.css",
-    )
+    missing_assets = [
+        filename
+        for filename in _REQUIRED_ASSETS
+        if not (_STATIC_DIR / filename).is_file()
+    ]
 
-    for filename in required_files:
-        filepath = _STATIC_DIR / filename
+    if missing_assets:
+        raise RuntimeError(
+            f"Missing Swagger assets: {', '.join(missing_assets)}"
+        )
 
-        if not filepath.is_file():
-            raise RuntimeError(f"Missing Swagger asset: {filepath}")
 
-    # Register microservice-specific static assets.
-    if not any(
+def _mount_static_assets(app: FastAPI) -> None:
+    """Mount Swagger static assets if they are not already mounted."""
+    already_mounted = any(
         getattr(route, "name", None) == _ASSETS_MOUNT_NAME
         for route in app.routes
-    ):
-        app.mount(
-            _ASSETS_MOUNT,
-            StaticFiles(directory=str(_STATIC_DIR)),
-            name=_ASSETS_MOUNT_NAME,
-        )
-
-    parameters = dict(swagger_ui_parameters or {})
-
-    @app.get(
-        docs_url,
-        include_in_schema=False,
-        name=_DOCS_ROUTE_NAME,
     )
-    async def swagger_docs(request: Request) -> HTMLResponse:
-        openapi_path = _route_path(request, "openapi")
 
-        initializer_path = _route_path(
-            request,
-            _ASSETS_MOUNT_NAME,
-            path="swagger-initializer.js",
-        )
+    if already_mounted:
+        return
 
-        css_path = _route_path(
-            request,
-            _ASSETS_MOUNT_NAME,
-            path="oauth2-scopes.css",
-        )
+    app.mount(
+        _ASSETS_MOUNT,
+        StaticFiles(directory=str(_STATIC_DIR)),
+        name=_ASSETS_MOUNT_NAME,
+    )
 
-        redirect_path = _route_path(
-            request,
-            _REDIRECT_ROUTE_NAME,
-        )
 
-        config = {
-            "url": openapi_path,
-            **parameters,
-            "oauth2RedirectUrl": redirect_path,
-        }
+def _build_swagger_html(
+    app: FastAPI,
+    request: Request,
+    parameters: dict[str, Any],
+    init_oauth: dict[str, Any] | None,
+) -> str:
+    """Build the Swagger UI HTML document."""
+    openapi_path = _route_path(request, "openapi")
 
-        if init_oauth:
-            config["oauth2"] = init_oauth
+    initializer_path = _route_path(
+        request,
+        _ASSETS_MOUNT_NAME,
+        path="swagger-initializer.js",
+    )
 
-        html_content = f"""<!DOCTYPE html>
+    css_path = _route_path(
+        request,
+        _ASSETS_MOUNT_NAME,
+        path="oauth2-scopes.css",
+    )
+
+    redirect_path = _route_path(
+        request,
+        _REDIRECT_ROUTE_NAME,
+    )
+
+    config = {
+        "url": openapi_path,
+        **parameters,
+        "oauth2RedirectUrl": redirect_path,
+    }
+
+    if init_oauth:
+        config["oauth2"] = init_oauth
+
+    title = html.escape(app.title, quote=True)
+
+    return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>{html.escape(app.title)} - Swagger UI</title>
+    <title>{title} - Swagger UI</title>
 
     <link
         rel="stylesheet"
@@ -158,7 +168,7 @@ def install_swagger_ui(
     <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@{_SWAGGER_UI_VERSION}/swagger-ui-bundle.js"></script>
 
     <script
-        id="mscore-swagger-config"
+        id="swagger-config"
         type="application/json">{_safe_json(config)}</script>
 
     <script
@@ -169,7 +179,57 @@ def install_swagger_ui(
 </html>
 """
 
-        return HTMLResponse(html_content)
+
+# ---------------------------------------------------------------------------
+# Public API
+# ---------------------------------------------------------------------------
+
+def install_swagger_ui(
+    app: FastAPI,
+    *,
+    docs_url: str = "/docs",
+    oauth2_redirect_url: str = "/docs/oauth2-redirect",
+    swagger_ui_parameters: dict[str, Any] | None = None,
+    init_oauth: dict[str, Any] | None = None,
+) -> None:
+    """Install a customized Swagger UI with OAuth2 scopes support.
+
+    The Swagger UI configuration uses browser-resolved relative paths
+    to support deployments behind HTTPS-terminating reverse proxies.
+
+    Args:
+        app: FastAPI application instance.
+        docs_url: URL path for Swagger UI.
+        oauth2_redirect_url: URL path for OAuth2 redirect handling.
+        swagger_ui_parameters: Additional Swagger UI configuration.
+        init_oauth: OAuth2 initialization configuration.
+
+    Raises:
+        RuntimeError: If OpenAPI is disabled or required static assets
+            are missing.
+    """
+    if app.openapi_url is None:
+        raise RuntimeError("FastAPI openapi_url must be enabled.")
+
+    _validate_static_assets()
+    _mount_static_assets(app)
+
+    parameters = dict(swagger_ui_parameters or {})
+
+    @app.get(
+        docs_url,
+        include_in_schema=False,
+        name=_DOCS_ROUTE_NAME,
+    )
+    async def swagger_docs(request: Request) -> HTMLResponse:
+        content = _build_swagger_html(
+            app=app,
+            request=request,
+            parameters=parameters,
+            init_oauth=init_oauth,
+        )
+
+        return HTMLResponse(content=content)
 
     @app.get(
         oauth2_redirect_url,

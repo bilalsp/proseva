@@ -1,4 +1,4 @@
-.mscore-security-requirements {
+.swagger-security-requirements {
     display: inline-flex;
     align-items: center;
     flex-wrap: wrap;
@@ -7,33 +7,33 @@
     font-size: 11px;
 }
 
-.mscore-security-alternative {
+.swagger-security-alternative {
     display: inline-flex;
     align-items: center;
     flex-wrap: wrap;
     gap: 4px;
 }
 
-.mscore-security-scheme {
+.swagger-security-scheme {
+    margin-right: 2px;
     color: #555;
     font-weight: 600;
-    margin-right: 2px;
 }
 
-.mscore-security-scope {
+.swagger-security-scope {
     display: inline-block;
     padding: 2px 6px;
     border: 1px solid #b7c9df;
     border-radius: 4px;
-    background: #edf4fb;
+    background-color: #edf4fb;
     color: #315b83;
     font-family: monospace;
     white-space: nowrap;
 }
 
-.mscore-security-operator {
+.swagger-security-operator {
+    margin: 0 3px;
     color: #777;
     font-size: 10px;
     font-weight: 600;
-    margin: 0 3px;
 }

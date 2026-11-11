@@ -1,7 +1,7 @@
 const OAuth2ScopesPlugin = (system) => {
     const React = system.React;
 
-    function toArray(value) {
+    const toArray = (value) => {
         if (!value) {
             return [];
         }
@@ -11,11 +11,11 @@ const OAuth2ScopesPlugin = (system) => {
         }
 
         return Array.isArray(value) ? value : [];
-    }
+    };
 
-    function getSecurityAlternatives(security) {
-        return toArray(security).map((requirement) => {
-            if (!requirement || typeof requirement.entrySeq !== "function") {
+    const getSecurityAlternatives = (security) =>
+        toArray(security).map((requirement) => {
+            if (typeof requirement?.entrySeq !== "function") {
                 return [];
             }
 
@@ -24,72 +24,57 @@ const OAuth2ScopesPlugin = (system) => {
                 scopes: toArray(scopes),
             }));
         });
-    }
 
-    function ScopeRequirements({ security }) {
+    const ScopeRequirements = ({ security }) => {
         const alternatives = getSecurityAlternatives(security);
 
-        if (!alternatives.length) {
-            return null;
-        }
-
-        const hasRequirements = alternatives.some(
-            (alternative) => alternative.length > 0
-        );
-
-        if (!hasRequirements) {
+        if (!alternatives.some((alternative) => alternative.length > 0)) {
             return null;
         }
 
         return React.createElement(
             "span",
             {
-                className: "mscore-security-requirements",
+                className: "swagger-security-requirements",
                 "aria-label": "Operation security requirements",
             },
             alternatives.map((alternative, alternativeIndex) =>
                 React.createElement(
                     React.Fragment,
-                    { key: alternativeIndex },
+                    { key: `alternative-${alternativeIndex}` },
 
-                    alternativeIndex > 0
-                        ? React.createElement(
-                              "span",
-                              {
-                                  className: "mscore-security-operator",
-                                  key: `or-${alternativeIndex}`,
-                              },
-                              "OR"
-                          )
-                        : null,
+                    alternativeIndex > 0 &&
+                        React.createElement(
+                            "span",
+                            {
+                                className: "swagger-security-operator",
+                            },
+                            "OR"
+                        ),
 
                     React.createElement(
                         "span",
                         {
-                            className: "mscore-security-alternative",
-                            key: `alternative-${alternativeIndex}`,
+                            className: "swagger-security-alternative",
                         },
                         alternative.map((requirement, requirementIndex) =>
                             React.createElement(
                                 React.Fragment,
-                                { key: requirementIndex },
+                                { key: `requirement-${requirementIndex}` },
 
-                                requirementIndex > 0
-                                    ? React.createElement(
-                                          "span",
-                                          {
-                                              className: "mscore-security-operator",
-                                              key: `and-${requirementIndex}`,
-                                          },
-                                          "AND"
-                                      )
-                                    : null,
+                                requirementIndex > 0 &&
+                                    React.createElement(
+                                        "span",
+                                        {
+                                            className: "swagger-security-operator",
+                                        },
+                                        "AND"
+                                    ),
 
                                 React.createElement(
                                     "span",
                                     {
-                                        className: "mscore-security-scheme",
-                                        key: `scheme-${requirementIndex}`,
+                                        className: "swagger-security-scheme",
                                     },
                                     requirement.scheme
                                 ),
@@ -98,7 +83,7 @@ const OAuth2ScopesPlugin = (system) => {
                                     React.createElement(
                                         "span",
                                         {
-                                            className: "mscore-security-scope",
+                                            className: "swagger-security-scope",
                                             key: `scope-${scopeIndex}`,
                                         },
                                         scope
@@ -110,17 +95,19 @@ const OAuth2ScopesPlugin = (system) => {
                 )
             )
         );
-    }
+    };
 
     return {
         wrapComponents: {
-            OperationSummary: (Original, system) => (props) => {
+            OperationSummary: (Original) => (props) => {
                 const security = props.operationProps.get("security");
-
                 const originalGetComponent = props.getComponent;
 
                 const getComponent = (name, withSystem) => {
-                    const Component = originalGetComponent(name, withSystem);
+                    const Component = originalGetComponent(
+                        name,
+                        withSystem
+                    );
 
                     if (name !== "authorizeOperationBtn") {
                         return Component;

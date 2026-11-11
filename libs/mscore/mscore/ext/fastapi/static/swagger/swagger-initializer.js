@@ -1,16 +1,17 @@
 
 import OAuth2ScopesPlugin from "./oauth2-scopes.js";
 
-const configElement = document.getElementById(
-    "mscore-swagger-config"
-);
+const CONFIG_ELEMENT_ID = "swagger-config";
+const SWAGGER_UI_ELEMENT_ID = "#swagger-ui";
+
+const configElement = document.getElementById(CONFIG_ELEMENT_ID);
 
 if (!configElement) {
-    throw new Error("Swagger config element not found");
+    throw new Error("Swagger configuration element not found.");
 }
 
 if (!window.SwaggerUIBundle) {
-    throw new Error("SwaggerUIBundle is not loaded");
+    throw new Error("Swagger UI bundle is not loaded.");
 }
 
 const config = JSON.parse(configElement.textContent);
@@ -24,10 +25,7 @@ const {
 // Resolve the OAuth2 callback against the browser's public origin.
 // This avoids depending on Uvicorn proxy headers.
 const resolvedRedirectUrl = oauth2RedirectUrl
-    ? new URL(
-        oauth2RedirectUrl,
-        window.location.origin
-    ).toString()
+    ? new URL(oauth2RedirectUrl, window.location.origin).toString()
     : undefined;
 
 const ui = window.SwaggerUIBundle({
@@ -37,7 +35,7 @@ const ui = window.SwaggerUIBundle({
         oauth2RedirectUrl: resolvedRedirectUrl,
     }),
 
-    dom_id: "#swagger-ui",
+    dom_id: SWAGGER_UI_ELEMENT_ID,
 
     presets: [
         window.SwaggerUIBundle.presets.apis,
