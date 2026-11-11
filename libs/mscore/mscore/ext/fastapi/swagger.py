@@ -12,16 +12,21 @@ from fastapi.openapi.docs import get_swagger_ui_oauth2_redirect_html
 from fastapi.responses import HTMLResponse
 from starlette.staticfiles import StaticFiles
 
+from mscore.settings import BaseAppSettings, get_settings
+
+
+app_settings: BaseAppSettings = get_settings()
+microservice_name = app_settings.ms.name
 
 _STATIC_DIR = Path(__file__).resolve().parent / "static" / "swagger"
 
 _SWAGGER_UI_VERSION = "5.17.14"
 
-_ASSETS_MOUNT = "/_mscore/swagger"
-_ASSETS_MOUNT_NAME = "mscore-swagger-assets"
+_ASSETS_MOUNT = f"/_{microservice_name}/swagger"
+_ASSETS_MOUNT_NAME = f"{microservice_name}-swagger-assets"
 
-_DOCS_ROUTE_NAME = "mscore-swagger-docs"
-_REDIRECT_ROUTE_NAME = "mscore-swagger-oauth2-redirect"
+_DOCS_ROUTE_NAME = f"{microservice_name}-swagger-docs"
+_REDIRECT_ROUTE_NAME = f"{microservice_name}-swagger-oauth2-redirect"
 
 
 def _safe_json(value: Any) -> str:
@@ -34,11 +39,12 @@ def _safe_json(value: Any) -> str:
     )
 
 
-def _route_path(request: Request, route_name: str, **path_params: Any) -> str:
-    """Resolve a named route without retaining its scheme or authority.
-
-    This avoids relying on forwarded headers for public URL generation.
-    """
+def _route_path(
+    request: Request,
+    route_name: str,
+    **path_params: Any,
+) -> str:
+    """Resolve a named route without retaining its scheme or authority."""
     url = request.url_for(route_name, **path_params)
     parsed = urlsplit(str(url))
 
@@ -55,9 +61,8 @@ def install_swagger_ui(
 ) -> None:
     """Install custom Swagger UI with OAuth2 scopes support.
 
-    All generated Swagger URLs are relative paths. The browser resolves
-    them against the public origin, so TLS termination at a reverse proxy
-    does not require Uvicorn to trust forwarded headers.
+    Browser-side URL resolution avoids depending on forwarded headers
+    for HTTPS termination at reverse proxies.
     """
 
     if app.openapi_url is None:
@@ -80,7 +85,7 @@ def install_swagger_ui(
         if not filepath.is_file():
             raise RuntimeError(f"Missing Swagger asset: {filepath}")
 
-    # Register static assets.
+    # Register microservice-specific static assets.
     if not any(
         getattr(route, "name", None) == _ASSETS_MOUNT_NAME
         for route in app.routes
@@ -93,15 +98,12 @@ def install_swagger_ui(
 
     parameters = dict(swagger_ui_parameters or {})
 
-    # Swagger documentation endpoint.
     @app.get(
         docs_url,
         include_in_schema=False,
         name=_DOCS_ROUTE_NAME,
     )
     async def swagger_docs(request: Request) -> HTMLResponse:
-
-        # Resolve paths without depending on the request scheme.
         openapi_path = _route_path(request, "openapi")
 
         initializer_path = _route_path(
@@ -124,9 +126,8 @@ def install_swagger_ui(
         config = {
             "url": openapi_path,
             **parameters,
+            "oauth2RedirectUrl": redirect_path,
         }
-
-        config["oauth2RedirectUrl"] = redirect_path
 
         if init_oauth:
             config["oauth2"] = init_oauth
@@ -170,7 +171,6 @@ def install_swagger_ui(
 
         return HTMLResponse(html_content)
 
-    # OAuth2 redirect endpoint.
     @app.get(
         oauth2_redirect_url,
         include_in_schema=False,
