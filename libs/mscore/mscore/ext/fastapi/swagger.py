@@ -5,6 +5,7 @@ import html
 import json
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlsplit
 
 from fastapi import FastAPI, Request
 from fastapi.openapi.docs import get_swagger_ui_oauth2_redirect_html
@@ -16,14 +17,32 @@ _STATIC_DIR = Path(__file__).resolve().parent / "static" / "swagger"
 
 _SWAGGER_UI_VERSION = "5.17.14"
 
+_ASSETS_MOUNT = "/_mscore/swagger"
+_ASSETS_MOUNT_NAME = "mscore-swagger-assets"
+
+_DOCS_ROUTE_NAME = "mscore-swagger-docs"
+_REDIRECT_ROUTE_NAME = "mscore-swagger-oauth2-redirect"
+
 
 def _safe_json(value: Any) -> str:
+    """Serialize JSON safely for embedding in HTML."""
     return (
         json.dumps(value)
         .replace("<", "\\u003c")
         .replace(">", "\\u003e")
         .replace("&", "\\u0026")
     )
+
+
+def _route_path(request: Request, route_name: str, **path_params: Any) -> str:
+    """Resolve a named route without retaining its scheme or authority.
+
+    This avoids relying on forwarded headers for public URL generation.
+    """
+    url = request.url_for(route_name, **path_params)
+    parsed = urlsplit(str(url))
+
+    return parsed.path + (f"?{parsed.query}" if parsed.query else "")
 
 
 def install_swagger_ui(
@@ -34,7 +53,12 @@ def install_swagger_ui(
     swagger_ui_parameters: dict[str, Any] | None = None,
     init_oauth: dict[str, Any] | None = None,
 ) -> None:
-    """Install custom Swagger UI with OAuth2 scopes support."""
+    """Install custom Swagger UI with OAuth2 scopes support.
+
+    All generated Swagger URLs are relative paths. The browser resolves
+    them against the public origin, so TLS termination at a reverse proxy
+    does not require Uvicorn to trust forwarded headers.
+    """
 
     if app.openapi_url is None:
         raise RuntimeError("FastAPI openapi_url must be enabled.")
@@ -52,73 +76,57 @@ def install_swagger_ui(
 
     for filename in required_files:
         filepath = _STATIC_DIR / filename
+
         if not filepath.is_file():
-            raise RuntimeError(
-                f"Missing Swagger asset: {filepath}"
-            )
+            raise RuntimeError(f"Missing Swagger asset: {filepath}")
 
-    # Register static files.
-    mount_name = "mscore-swagger-assets"
-
+    # Register static assets.
     if not any(
-        getattr(route, "name", None) == mount_name
+        getattr(route, "name", None) == _ASSETS_MOUNT_NAME
         for route in app.routes
     ):
         app.mount(
-            "/_mscore/swagger",
+            _ASSETS_MOUNT,
             StaticFiles(directory=str(_STATIC_DIR)),
-            name=mount_name,
+            name=_ASSETS_MOUNT_NAME,
         )
 
     parameters = dict(swagger_ui_parameters or {})
 
-    # Custom Swagger documentation endpoint.
+    # Swagger documentation endpoint.
     @app.get(
         docs_url,
         include_in_schema=False,
-        name="mscore-swagger-docs",
+        name=_DOCS_ROUTE_NAME,
     )
     async def swagger_docs(request: Request) -> HTMLResponse:
 
-        openapi_url = str(request.url_for("openapi"))
+        # Resolve paths without depending on the request scheme.
+        openapi_path = _route_path(request, "openapi")
 
-        initializer_url = str(
-            request.url_for(
-                mount_name,
-                path="swagger-initializer.js",
-            )
+        initializer_path = _route_path(
+            request,
+            _ASSETS_MOUNT_NAME,
+            path="swagger-initializer.js",
         )
 
-        css_url = str(
-            request.url_for(
-                mount_name,
-                path="oauth2-scopes.css",
-            )
+        css_path = _route_path(
+            request,
+            _ASSETS_MOUNT_NAME,
+            path="oauth2-scopes.css",
         )
 
-        redirect_url = str(
-            request.url_for("mscore-swagger-oauth2-redirect")
+        redirect_path = _route_path(
+            request,
+            _REDIRECT_ROUTE_NAME,
         )
-
-
-        print("Request URL:", request.url)
-        print("Request base URL:", request.base_url)
-        print("Request scheme:", request.scope.get("scheme"))
-        print(
-            "X-Forwarded-Proto:",
-            request.headers.get("x-forwarded-proto"),
-        )
-
-        print("CSS URL:", css_url)
-        print("Initializer URL:", initializer_url)
-
-
 
         config = {
-            "url": openapi_url,
-            "oauth2RedirectUrl": redirect_url,
+            "url": openapi_path,
             **parameters,
         }
+
+        config["oauth2RedirectUrl"] = redirect_path
 
         if init_oauth:
             config["oauth2"] = init_oauth
@@ -139,7 +147,7 @@ def install_swagger_ui(
 
     <link
         rel="stylesheet"
-        href="{html.escape(css_url, quote=True)}"
+        href="{html.escape(css_path, quote=True)}"
     >
 </head>
 
@@ -154,7 +162,7 @@ def install_swagger_ui(
 
     <script
         type="module"
-        src="{html.escape(initializer_url, quote=True)}">
+        src="{html.escape(initializer_path, quote=True)}">
     </script>
 </body>
 </html>
@@ -166,7 +174,7 @@ def install_swagger_ui(
     @app.get(
         oauth2_redirect_url,
         include_in_schema=False,
-        name="mscore-swagger-oauth2-redirect",
+        name=_REDIRECT_ROUTE_NAME,
     )
     async def swagger_oauth2_redirect() -> HTMLResponse:
         return get_swagger_ui_oauth2_redirect_html()

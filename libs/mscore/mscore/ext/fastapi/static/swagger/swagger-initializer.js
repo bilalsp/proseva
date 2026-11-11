@@ -15,10 +15,27 @@ if (!window.SwaggerUIBundle) {
 
 const config = JSON.parse(configElement.textContent);
 
-const { oauth2, ...swaggerConfig } = config;
+const {
+    oauth2,
+    oauth2RedirectUrl,
+    ...swaggerConfig
+} = config;
+
+// Resolve the OAuth2 callback against the browser's public origin.
+// This avoids depending on Uvicorn proxy headers.
+const resolvedRedirectUrl = oauth2RedirectUrl
+    ? new URL(
+        oauth2RedirectUrl,
+        window.location.origin
+    ).toString()
+    : undefined;
 
 const ui = window.SwaggerUIBundle({
     ...swaggerConfig,
+
+    ...(resolvedRedirectUrl && {
+        oauth2RedirectUrl: resolvedRedirectUrl,
+    }),
 
     dom_id: "#swagger-ui",
 
