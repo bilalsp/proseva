@@ -3,7 +3,6 @@ from typing import Annotated
 from fastapi import Depends, Request
 
 from mscore.auth.authentication.schemes import get_oauth2_scheme
-from mscore.auth.exceptions import UnauthorizedError
 from mscore.auth.models import AccessToken, Principal
 from mscore.auth.providers.protocols import TokenValidator
 from mscore.auth.providers.state import AuthProviderState

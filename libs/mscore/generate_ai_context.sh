@@ -1,6 +1,6 @@
 {
     echo "========== DIRECTORY TREE =========="
-    cmd //c "tree /A /F mscore\\auth"
+    cmd //c "tree /A /F mscore\\ext"
 
     echo
     echo "========== PYTHON FILE CONTENTS =========="

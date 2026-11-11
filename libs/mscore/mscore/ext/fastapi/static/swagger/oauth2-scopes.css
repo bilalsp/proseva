@@ -1,0 +1,39 @@
+.mscore-security-requirements {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-right: 8px;
+    font-size: 11px;
+}
+
+.mscore-security-alternative {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.mscore-security-scheme {
+    color: #555;
+    font-weight: 600;
+    margin-right: 2px;
+}
+
+.mscore-security-scope {
+    display: inline-block;
+    padding: 2px 6px;
+    border: 1px solid #b7c9df;
+    border-radius: 4px;
+    background: #edf4fb;
+    color: #315b83;
+    font-family: monospace;
+    white-space: nowrap;
+}
+
+.mscore-security-operator {
+    color: #777;
+    font-size: 10px;
+    font-weight: 600;
+    margin: 0 3px;
+}
