@@ -66,6 +66,8 @@ class MicroServiceSettings(BaseModel):
 
 
 class SwaggerSettings(BaseModel):
+    title: str
+    description: str
     client_id: str
     use_pkce_with_authorization_code_grant: bool = True
     display_request_duration: bool = True

@@ -52,6 +52,8 @@ def create_app(
 
     # Create the ASGI application.
     app = FastAPI(
+        title=settings.swagger.title,
+        description=settings.swagger.description,
         version=get_project_version("pyproject.toml"),
         lifespan=LifespanManager(lifespans),
         exception_handlers={

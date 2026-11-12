@@ -15,7 +15,10 @@ def runserver():
         host="0.0.0.0",
         port=settings.ms.port,
         reload=settings.ms.reloading,
+        reload_delay=1.0,
         reload_dirs=["src", "/opt/proseva/libs/mscore/mscore"],
+        # proxy_headers=True,
+        # forwarded_allow_ips="*",
     )
 
 
