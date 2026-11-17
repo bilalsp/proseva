@@ -1,4 +1,5 @@
 from typing import Annotated, Literal
+from pathlib import Path
 
 from pydantic import (
     BaseModel,
@@ -28,14 +29,23 @@ class KeycloakSettings(BaseModel):
         ),
     ]
     client_secret_key: Annotated[
-        str | None,
+        str,
         Field(
-            None,
             description="""The secret which allows the client to prove its identity to the
             Keycloak server. NOTE: It should be known only to the application and the
             authorization server. A public Keycloak client doesn't need it.""",
         ),
     ]
+    verify: Annotated[
+        str | bool,
+        Field(
+            description=(
+                "CA certificate path used to verify the Keycloak server. "
+                "Set to True to use the system's default CA certificates, "
+                "or False to disable certificate verification."
+            ),
+        )
+    ] = True
 
     @computed_field
     @property

@@ -8,6 +8,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from mscore.auth.providers.keycloak.settings import KeycloakSettings
 from mscore.auth.providers.auth0.settings import Auth0Settings
+from mscore.observability.settings import ObservabilitySettings
 from .db import DatabaseSettings
 from .exceptions import MSCoreUserError
 
@@ -83,6 +84,7 @@ class BaseAppSettings(BaseSettings):
         KeycloakSettings | Auth0Settings,
         Field(discriminator="provider"),
     ]
+    observability: ObservabilitySettings
     swagger: SwaggerSettings
 
     model_config = SettingsConfigDict(

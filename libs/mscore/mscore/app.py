@@ -9,6 +9,7 @@ from starlette.types import Lifespan
 
 from mscore.auth.providers.factory import get_auth_provider_lifespan
 from mscore.ext.fastapi.swagger import install_swagger_ui
+from mscore.observability.fastapi.integration import instrument_fastapi
 from .errors import ErrorHandlingMiddleware, ErrorResponsesBuilder
 from .lifespan_manager import LifespanManager
 from .logging import setup_logging
@@ -99,6 +100,14 @@ def create_app(
             ),
             "scopes": " ".join(settings.swagger.oauth2_scopes),
         },
+    )
+
+    # setup observability
+    instrument_fastapi(
+        app,
+        settings.observability,
+        service_name=settings.ms.name,
+        environment=settings.ms.environment.value,
     )
 
     # monitoring router
